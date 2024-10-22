@@ -1,0 +1,12 @@
+fiona
+geographiclib
+geopandas
+gerrychain
+matplotlib
+numpy
+pandas
+rdabase
+rdadccvt
+rdaensemble
+rdapy
+rdascore
