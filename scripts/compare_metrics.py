@@ -14,7 +14,7 @@ from csv import DictReader
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from rdaensemble import ratings_dimensions
+from rdatools import ratings_dimensions
 
 
 def is_realistic(ratings: List[int | float]) -> bool:
@@ -93,7 +93,7 @@ def scores_to_df(
 
 # Setup
 
-scores_csv = "../../iCloud/fileout/tradeoffs/NC/ensembles/NC20C_scores.csv"
+scores_csv = "../vtd_ensembles/2020_VTD/NC/NC20C_scores.csv"
 
 y_metrics: List[str] = [
     "proportionality",
