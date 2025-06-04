@@ -41,6 +41,9 @@ for xx in states:
             ].mean()  # "Dem seats" is 'fptp_seats' in the dataframe
             d_seats[combo][ensemble] = float(mean_seats)
 
+            print(f"Processing {xx}/{chamber}/{ensemble} = {mean_seats:.6f}")
+            pass  # for debugging
+
 header: str = ",".join(v for v in table_6)
 
 print(f",{header}")
