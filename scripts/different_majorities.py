@@ -19,16 +19,25 @@ df = pd.read_parquet(
 
 # NOTE -- "Dem seats" is 'estimated_seats' in the dataframe
 
-combos: List[str] = list()
-majorities_by_combo: Dict[str, Dict[str, int]] = dict()
+# combos: List[str] = list()
+# majorities_by_combo: Dict[str, Dict[str, int]] = dict()
 
 for xx in states:
+    subset_df = df[
+        (df["state"] == xx) & (df["chamber"] == "congress") & (df["ensemble"] == "A0")
+    ]
+    first_row = subset_df.iloc[0]
+    Vf: float = subset_df.iloc[0][
+        "estimated_vote_pct"
+    ]  # Same for all chambers & ensembles
+
     for chamber in chambers:
         combo: str = f"{xx}/{chamber}"
-        combos.append(combo)
+        # combos.append(combo)
 
         n_districts: int = DISTRICTS_BY_STATE[xx][chamber]
         majority: int = n_districts // 2 + 1
+        proportional: int = round(Vf * n_districts)
 
         majorities: Dict[str, int] = defaultdict(int)
 
@@ -40,16 +49,19 @@ for xx in states:
             ]["estimated_seats"].mean()
 
             if mean_seats > majority:
-                majorities["over"] += 1
+                majorities["more"] += 1
             else:
-                majorities["under"] += 1
+                majorities["less"] += 1
 
-        majorities_by_combo[combo] = majorities
+        print(
+            f"{combo:12} -- districts: {n_districts:>3}, majority: {majority:>2}, D vote share: {Vf:>.2%}, proportional: {proportional:>2d}, # more: {majorities["more"]:>2}, # less: {majorities["less"]:>2}"
+        )
+#         majorities_by_combo[combo] = majorities
 
-for combo in combos:
-    print(
-        f"{combo:12} -- over: {majorities_by_combo[combo]["over"]:>2}, under: {majorities_by_combo[combo]["under"]:>2}"
-    )
+# for combo in combos:
+#     print(
+#         f"{combo:12} -- districts: {n_districts:>2}, majority: {majority:>2}, proportional: {proportional:>2d}, # more: {majorities_by_combo[combo]["more"]:>2}, # less: {majorities_by_combo[combo]["less"]:>2}"
+#     )
 pass  # for debugging
 
 

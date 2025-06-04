@@ -1,21 +1,25 @@
-FL/congress  -- over:  0, under: 11
-FL/upper     -- over:  0, under: 11
-FL/lower     -- over:  0, under: 11
-IL/congress  -- over: 11, under:  0
-IL/upper     -- over: 11, under:  0
-IL/lower     -- over: 11, under:  0
-MI/congress  -- over:  0, under: 11
-MI/upper     -- over:  0, under: 11
-MI/lower     -- over:  0, under: 11
-NC/congress  -- over:  0, under: 11
-NC/upper     -- over:  0, under: 11
-NC/lower     -- over:  0, under: 11
-NY/congress  -- over: 11, under:  0
-NY/upper     -- over: 11, under:  0
-NY/lower     -- over: 11, under:  0
-OH/congress  -- over:  0, under: 11
-OH/upper     -- over:  0, under: 11
-OH/lower     -- over:  0, under: 11
-WI/congress  -- over:  0, under: 11
-WI/upper     -- over:  0, under: 11
-WI/lower     -- over:  0, under: 11
+Mean D seats more or less than a majority for the 11 ensembles* for each state & chamber combo:
+
+FL/congress  -- districts:  28, majority: 15, D vote share: 48.37%, proportional: 14, # more:  0, # less: 11
+FL/upper     -- districts:  40, majority: 21, D vote share: 48.37%, proportional: 19, # more:  0, # less: 11
+FL/lower     -- districts: 120, majority: 61, D vote share: 48.37%, proportional: 58, # more:  0, # less: 11
+IL/congress  -- districts:  17, majority:  9, D vote share: 58.17%, proportional: 10, # more: 11, # less:  0
+IL/upper     -- districts:  59, majority: 30, D vote share: 58.17%, proportional: 34, # more: 11, # less:  0
+IL/lower     -- districts: 118, majority: 60, D vote share: 58.17%, proportional: 69, # more: 11, # less:  0
+MI/congress  -- districts:  13, majority:  7, D vote share: 51.88%, proportional:  7, # more:  0, # less: 11
+MI/upper     -- districts:  38, majority: 20, D vote share: 51.88%, proportional: 20, # more:  0, # less: 11
+MI/lower     -- districts: 110, majority: 56, D vote share: 51.88%, proportional: 57, # more:  0, # less: 11
+NC/congress  -- districts:  14, majority:  8, D vote share: 49.43%, proportional:  7, # more:  0, # less: 11
+NC/upper     -- districts:  50, majority: 26, D vote share: 49.43%, proportional: 25, # more:  0, # less: 11
+NC/lower     -- districts: 120, majority: 61, D vote share: 49.43%, proportional: 59, # more:  0, # less: 11
+NY/congress  -- districts:  26, majority: 14, D vote share: 64.78%, proportional: 17, # more: 11, # less:  0
+NY/upper     -- districts:  63, majority: 32, D vote share: 64.78%, proportional: 41, # more: 11, # less:  0
+NY/lower     -- districts: 150, majority: 76, D vote share: 64.78%, proportional: 97, # more: 11, # less:  0
+OH/congress  -- districts:  15, majority:  8, D vote share: 46.38%, proportional:  7, # more:  0, # less: 11
+OH/upper     -- districts:  33, majority: 17, D vote share: 46.38%, proportional: 15, # more:  0, # less: 11
+OH/lower     -- districts:  99, majority: 50, D vote share: 46.38%, proportional: 46, # more:  0, # less: 11
+WI/congress  -- districts:   8, majority:  5, D vote share: 50.68%, proportional:  4, # more:  0, # less: 11
+WI/upper     -- districts:  33, majority: 17, D vote share: 50.68%, proportional: 17, # more:  0, # less: 11
+WI/lower     -- districts:  99, majority: 50, D vote share: 50.68%, proportional: 50, # more:  0, # less: 11
+
+* A0, Pop-, Pop+, B, Rev, C, D, R25, R50, R75, R100
