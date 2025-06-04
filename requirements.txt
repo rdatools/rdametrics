@@ -1,3 +1,5 @@
+rdapy
 numpy
 pandas
 pyarrow
+networkx
