@@ -19,41 +19,42 @@ scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 
 df = pd.read_parquet(os.path.expanduser(scores_path))
 
-# NOTE -- "Dem seats" is 'estimated_seats' in the dataframe
-
 for xx in states:
-    subset_df = df[
-        (df["state"] == xx) & (df["chamber"] == "congress") & (df["ensemble"] == "A0")
-    ]
-    first_row = subset_df.iloc[0]
-    Vf: float = subset_df.iloc[0][
-        "estimated_vote_pct"
-    ]  # Same for all chambers & ensembles
-
     for chamber in chambers:
-        combo: str = f"{xx}/{chamber}"
+        subset_A0 = df[
+            (df["state"] == xx) & (df["chamber"] == chamber) & (df["ensemble"] == "A0")
+        ]["fptp_seats"]
 
-        n_districts: int = DISTRICTS_BY_STATE[xx][chamber]
-        majority: int = n_districts // 2 + 1
-        proportional: int = round(Vf * n_districts)
+        subset_Pop = df[
+            (df["state"] == xx)
+            & (df["chamber"] == chamber)
+            & (df["ensemble"] == "Pop+")
+        ]["fptp_seats"]
 
-        majorities: Dict[str, int] = defaultdict(int)
-
-        for ensemble in ensembles:
-            mean_seats = df[
-                (df["state"] == xx)
-                & (df["chamber"] == chamber)
-                & (df["ensemble"] == ensemble)
-            ]["estimated_seats"].mean()
-
-            if mean_seats > majority:
-                majorities["more"] += 1
-            else:
-                majorities["less"] += 1
-
+        are_all_equal = subset_A0.equals(subset_Pop)
         print(
-            f"{combo:12} -- districts: {n_districts:>3}, majority: {majority:>2}, D vote share: {Vf:>.2%}, proportional: {proportional:>2d}, # more: {majorities["more"]:>2}, # less: {majorities["less"]:>2}"
+            f"For {xx}/{chamber} and A0 and Pop+, all values are equal: {are_all_equal}"
         )
 
+        # # Or element-wise comparison (if lengths might differ)
+        # if len(subset_A0) == len(subset_Pop):
+        #     element_wise_equal = (subset_A0.values == subset_Pop.values).all()
+        #     print(f"Element-wise comparison: {element_wise_equal}")
+        # else:
+        #     print(
+        #         f"Different lengths: A0 has {len(subset_A0)} rows, Pop+ has {len(subset_Pop)} rows"
+        #     )
+
+# for index, row in df.iterrows():
+#     xx: str = row["state"]
+#     chamber: str = row["chamber"]
+#     ensemble: str = row["ensemble"]
+
+#     print(f"{xx:>2} {chamber:>10} {ensemble:>3} -- {row}")
+
+#     if index == 10:
+#         break
+
+pass
 
 ### END ###

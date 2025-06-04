@@ -3,6 +3,8 @@
 """
 DEM SEATS BY STATE/CHAMBER COMBO AND ENSEMBLE TYPE
 (the values behind Table 6)
+
+TODO - Something's not right with this Pop-/Pop+ output.
 """
 
 from typing import List, Dict
@@ -18,9 +20,7 @@ scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 
 df = pd.read_parquet(os.path.expanduser(scores_path))
 
-table_6: List[str] = ["A0", "A1"] + ensembles[1:]  # Insert 'A1' after 'A0'
-
-# NOTE -- "Dem seats" is 'fptp_seats' in the dataframe
+table_6: List[str] = [e for e in ensembles if e not in ["A2", "A3", "A4", "Rev*"]]
 
 d_seats: Dict[str, Dict[str, float]] = dict()
 combos: List[str] = list()
@@ -36,10 +36,12 @@ for xx in states:
                 (df["state"] == xx)
                 & (df["chamber"] == chamber)
                 & (df["ensemble"] == ensemble)
-            ]["fptp_seats"].mean()
+            ][
+                "fptp_seats"
+            ].mean()  # "Dem seats" is 'fptp_seats' in the dataframe
             d_seats[combo][ensemble] = float(mean_seats)
 
-header: str = ",".join(v for v in table_6)  # In the proper order
+header: str = ",".join(v for v in table_6)
 
 print(f",{header}")
 for combo in combos:
