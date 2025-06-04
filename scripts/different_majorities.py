@@ -13,14 +13,12 @@ from collections import defaultdict
 from rdapy import DISTRICTS_BY_STATE
 from rdametrics import states, chambers, ensembles
 
-df = pd.read_parquet(
-    os.path.expanduser("~/local/beta-ensembles/dataframe/contents/scores_df.parquet")
-)
+
+scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
+
+df = pd.read_parquet(os.path.expanduser(scores_path))
 
 # NOTE -- "Dem seats" is 'estimated_seats' in the dataframe
-
-# combos: List[str] = list()
-# majorities_by_combo: Dict[str, Dict[str, int]] = dict()
 
 for xx in states:
     subset_df = df[
@@ -33,7 +31,6 @@ for xx in states:
 
     for chamber in chambers:
         combo: str = f"{xx}/{chamber}"
-        # combos.append(combo)
 
         n_districts: int = DISTRICTS_BY_STATE[xx][chamber]
         majority: int = n_districts // 2 + 1
@@ -56,13 +53,6 @@ for xx in states:
         print(
             f"{combo:12} -- districts: {n_districts:>3}, majority: {majority:>2}, D vote share: {Vf:>.2%}, proportional: {proportional:>2d}, # more: {majorities["more"]:>2}, # less: {majorities["less"]:>2}"
         )
-#         majorities_by_combo[combo] = majorities
-
-# for combo in combos:
-#     print(
-#         f"{combo:12} -- districts: {n_districts:>2}, majority: {majority:>2}, proportional: {proportional:>2d}, # more: {majorities_by_combo[combo]["more"]:>2}, # less: {majorities_by_combo[combo]["less"]:>2}"
-#     )
-pass  # for debugging
 
 
 ### END ###

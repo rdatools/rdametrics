@@ -13,9 +13,10 @@ import pandas as pd
 from rdapy import DISTRICTS_BY_STATE
 from rdametrics import states, chambers, ensembles
 
-df = pd.read_parquet(
-    os.path.expanduser("~/local/beta-ensembles/dataframe/contents/scores_df.parquet")
-)
+
+scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
+
+df = pd.read_parquet(os.path.expanduser(scores_path))
 
 table_6: List[str] = ["A0", "A1"] + ensembles[1:]  # Insert 'A1' after 'A0'
 
