@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-DO ANY COMBOS HAVE DIFFERENT MAJORITIES IN DIFFERENT ENSEMBLES?
+IDENTIFY FREQUENCY OF CONFLICTS BETWEEN METRICS THAT PUPORT TO MEASURE THE DEGREE TO WHICH
+A PLAN FAVORS ONE PARTY OR ANOTHER.
 """
 
 from typing import List, Dict
@@ -17,6 +18,8 @@ from rdametrics import states, chambers, ensembles
 scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 
 df = pd.read_parquet(os.path.expanduser(scores_path))
+
+# NOTE -- "Dem seats" is 'estimated_seats' in the dataframe
 
 for xx in states:
     subset_df = df[

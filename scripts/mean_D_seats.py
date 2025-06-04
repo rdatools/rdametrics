@@ -20,7 +20,7 @@ df = pd.read_parquet(os.path.expanduser(scores_path))
 
 table_6: List[str] = ["A0", "A1"] + ensembles[1:]  # Insert 'A1' after 'A0'
 
-# NOTE -- "Dem seats" is 'estimated_seats' in the dataframe
+# NOTE -- "Dem seats" is 'fptp_seats' in the dataframe
 
 d_seats: Dict[str, Dict[str, float]] = dict()
 combos: List[str] = list()
@@ -36,7 +36,7 @@ for xx in states:
                 (df["state"] == xx)
                 & (df["chamber"] == chamber)
                 & (df["ensemble"] == ensemble)
-            ]["estimated_seats"].mean()
+            ]["fptp_seats"].mean()
             d_seats[combo][ensemble] = float(mean_seats)
 
 header: str = ",".join(v for v in table_6)  # In the proper order
