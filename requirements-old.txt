@@ -1,8 +1,0 @@
-fiona
-geographiclib
-geopandas
-gerrychain
-matplotlib
-numpy
-pandas
-rda-toolkit
