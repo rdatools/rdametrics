@@ -38,7 +38,7 @@ categories: List[str] = [
     "mmd",
 ]
 
-metrics: Dict[str, List[str]] = {
+metrics_by_category: Dict[str, List[str]] = {
     "general": [
         "population_deviation",
         "estimated_vote_pct",
