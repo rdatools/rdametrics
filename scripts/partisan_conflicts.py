@@ -81,11 +81,9 @@ for m in partisan_metrics[1:]:
         f"- {m}: {conflicts:,} of {total_plans:,} conflicts ({conflicts / total_plans:.1%})"
     )
     print(
-        f"       across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations."
+        f"  across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations."
     )
-    print(
-        f"       Example: Map {name} has {sample:.4f} vs. disproportionality {disp:.2%}."
-    )
+    print(f"  Example: Map {name} has {sample:.4f} vs. disproportionality {disp:.2%}.")
 print()
 print(
     f"Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'."
