@@ -1,10 +1,10 @@
 Partisan Conflicts* Summary:
-- efficiency_gap: 976,689 of 6,719,956 conflicts (14.5%). 
-- seats_bias: 2,196,201 of 6,719,956 conflicts (32.7%). 
-- votes_bias: 2,194,088 of 6,719,956 conflicts (32.7%). 
-- geometric_seats_bias: 2,247,100 of 6,719,956 conflicts (33.4%). 
-- declination: 1,906,202 of 6,719,956 conflicts (28.4%). 
-- mean_median_statewide: 2,354,667 of 6,719,956 conflicts (35.0%). 
-- lopsided_outcomes: 2,961,816 of 6,719,956 conflicts (44.1%). 
+- efficiency_gap: 976,689 of 6,719,956 conflicts (14.5%) across 236 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+- seats_bias: 2,196,201 of 6,719,956 conflicts (32.7%) across 255 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+- votes_bias: 2,194,088 of 6,719,956 conflicts (32.7%) across 255 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+- geometric_seats_bias: 2,247,100 of 6,719,956 conflicts (33.4%) across 255 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+- declination: 1,906,202 of 6,719,956 conflicts (28.4%) across 238 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+- mean_median_statewide: 2,354,667 of 6,719,956 conflicts (35.0%) across 287 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+- lopsided_outcomes: 2,961,816 of 6,719,956 conflicts (44.1%) across 273 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
 
 * When the sign of a metric is the opposite of the sign for simple 'disproportionality'.

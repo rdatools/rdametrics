@@ -38,7 +38,7 @@ def same_sign(a, b):
 
 counters: Dict[str, Dict[str, Any]] = dict()
 for m in partisan_metrics[1:]:
-    counters[m] = {"state": set(), "chamber": set(), "ensemble": set(), "conflicts": 0}
+    counters[m] = {"combinations": set(), "conflicts": 0}
 
 total_plans: int = len(df)
 for index, row in df.iterrows():
@@ -50,17 +50,17 @@ for index, row in df.iterrows():
         if same_sign(row[m], row["disproportionality"]):
             continue
         else:
-            counters[m]["state"].add(xx)
-            counters[m]["chamber"].add(chamber)
-            counters[m]["ensemble"].add(ensemble)
+            counters[m]["combinations"].add((xx, chamber, ensemble))
             counters[m]["conflicts"] += 1
 
 print("Partisan Conflicts* Summary:")
 for m in partisan_metrics[1:]:
     conflicts: int = counters[m]["conflicts"]
+    combos: int = len(counters[m]["combinations"])
     print(
-        f"- {m}: {conflicts:,} of {total_plans:,} conflicts ({conflicts / total_plans:.1%}). "
+        f"- {m}: {conflicts:,} of {total_plans:,} conflicts ({conflicts / total_plans:.1%}) across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. "
     )
+print()
 print(
     f"* When the sign of a metric is the opposite of the sign for simple 'disproportionality'."
 )
