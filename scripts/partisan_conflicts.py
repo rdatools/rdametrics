@@ -33,18 +33,26 @@ partisan_metrics: List[str] = [
 
 
 def same_sign(a, b):
-    return (a >= 0) == (b >= 0)
+    return a * b > 0
 
 
 counters: Dict[str, Dict[str, Any]] = dict()
 for m in partisan_metrics[1:]:
-    counters[m] = {"combinations": set(), "conflicts": 0}
+    counters[m] = {
+        "combinations": set(),
+        "conflicts": 0,
+        "example": None,
+        "disproportionality": None,
+    }
 
 total_plans: int = len(df)
 for index, row in df.iterrows():
     xx: str = row["state"]
     chamber: str = row["chamber"]
     ensemble: str = row["ensemble"]
+
+    if ensemble not in ensembles:
+        continue
 
     for m in partisan_metrics[1:]:
         if same_sign(row[m], row["disproportionality"]):
@@ -53,16 +61,26 @@ for index, row in df.iterrows():
             counters[m]["combinations"].add((xx, chamber, ensemble))
             counters[m]["conflicts"] += 1
 
-print("Partisan Conflicts* Summary:")
+            if counters[m]["example"] is None:
+                counters[m]["example"] = row[m]
+                counters[m]["disproportionality"] = row["disproportionality"]
+
+print("Partisan Conflicts Summary:")
 for m in partisan_metrics[1:]:
     conflicts: int = counters[m]["conflicts"]
     combos: int = len(counters[m]["combinations"])
+    sample: float = counters[m]["example"]
+    disp: float = counters[m]["disproportionality"]
     print(
-        f"- {m}: {conflicts:,} of {total_plans:,} conflicts ({conflicts / total_plans:.1%}) across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. "
+        f"- {m}: {conflicts:,} of {total_plans:,} conflicts ({conflicts / total_plans:.1%})"
     )
+    print(
+        f"       across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations."
+    )
+    print(f"       Example: {sample:.2f} vs. disproportionality {disp:.2f}.")
 print()
 print(
-    f"* When the sign of a metric is the opposite of the sign for simple 'disproportionality'."
+    f"Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'."
 )
 
 pass
