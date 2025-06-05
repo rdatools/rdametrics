@@ -20,41 +20,30 @@ scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 df = pd.read_parquet(os.path.expanduser(scores_path))
 ensembles = [e for e in ensembles if e not in ["A1", "A2", "A3", "A4", "Rev*"]]
 
-for xx in states:
-    for chamber in chambers:
-        subset_A0 = df[
-            (df["state"] == xx) & (df["chamber"] == chamber) & (df["ensemble"] == "A0")
-        ]["fptp_seats"]
+partisan_metrics: List[str] = [
+    "estimated_seats",
+    "pr_deviation",
+    "disproportionality",
+    "fptp_seats",
+    "efficiency_gap_wasted_votes",
+    "efficiency_gap_statewide",
+    "efficiency_gap",
+    "seats_bias",
+    "votes_bias",
+    "geometric_seats_bias",
+    "declination",
+    "mean_median_statewide",
+    "mean_median_average_district",
+    "turnout_bias",
+    "lopsided_outcomes",
+    "proportionality",
+]
 
-        subset_Pop = df[
-            (df["state"] == xx)
-            & (df["chamber"] == chamber)
-            & (df["ensemble"] == "Pop+")
-        ]["fptp_seats"]
+for index, row in df.iterrows():
+    print(row)
 
-        are_all_equal = subset_A0.equals(subset_Pop)
-        print(
-            f"For {xx}/{chamber} and A0 and Pop+, all values are equal: {are_all_equal}"
-        )
-
-        # # Or element-wise comparison (if lengths might differ)
-        # if len(subset_A0) == len(subset_Pop):
-        #     element_wise_equal = (subset_A0.values == subset_Pop.values).all()
-        #     print(f"Element-wise comparison: {element_wise_equal}")
-        # else:
-        #     print(
-        #         f"Different lengths: A0 has {len(subset_A0)} rows, Pop+ has {len(subset_Pop)} rows"
-        #     )
-
-# for index, row in df.iterrows():
-#     xx: str = row["state"]
-#     chamber: str = row["chamber"]
-#     ensemble: str = row["ensemble"]
-
-#     print(f"{xx:>2} {chamber:>10} {ensemble:>3} -- {row}")
-
-#     if index == 10:
-#         break
+    if index == 10:
+        break
 
 pass
 
