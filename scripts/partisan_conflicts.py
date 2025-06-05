@@ -33,6 +33,9 @@ partisan_metrics: List[str] = [
 
 
 def same_sign(a, b):
+    if a == 0.0 or b == 0.0:
+        return True
+
     return a * b > 0
 
 
@@ -42,6 +45,7 @@ for m in partisan_metrics[1:]:
         "combinations": set(),
         "conflicts": 0,
         "example": None,
+        "value": None,
         "disproportionality": None,
     }
 
@@ -61,15 +65,17 @@ for index, row in df.iterrows():
             counters[m]["combinations"].add((xx, chamber, ensemble))
             counters[m]["conflicts"] += 1
 
-            if counters[m]["example"] is None:
-                counters[m]["example"] = row[m]
+            if counters[m]["example"] is None or counters[m]["value"] < 0.005:
+                counters[m]["example"] = row["map"]
+                counters[m]["value"] = row[m]
                 counters[m]["disproportionality"] = row["disproportionality"]
 
 print("Partisan Conflicts Summary:")
 for m in partisan_metrics[1:]:
     conflicts: int = counters[m]["conflicts"]
     combos: int = len(counters[m]["combinations"])
-    sample: float = counters[m]["example"]
+    name: str = counters[m]["example"]
+    sample: float = counters[m]["value"]
     disp: float = counters[m]["disproportionality"]
     print(
         f"- {m}: {conflicts:,} of {total_plans:,} conflicts ({conflicts / total_plans:.1%})"
@@ -77,7 +83,9 @@ for m in partisan_metrics[1:]:
     print(
         f"       across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations."
     )
-    print(f"       Example: {sample:.2f} vs. disproportionality {disp:.2f}.")
+    print(
+        f"       Example: Map {name} has {sample:.4f} vs. disproportionality {disp:.2%}."
+    )
 print()
 print(
     f"Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'."
