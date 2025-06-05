@@ -47,6 +47,7 @@ for m in partisan_metrics[1:]:
         "example": None,
         "value": None,
         "disproportionality": None,
+        "delta": None,
     }
 
 total_plans: int = len(df)
@@ -65,10 +66,13 @@ for index, row in df.iterrows():
             counters[m]["combinations"].add((xx, chamber, ensemble))
             counters[m]["conflicts"] += 1
 
-            if counters[m]["example"] is None or counters[m]["value"] < 0.005:
+            delta: float = abs(row[m] - row["disproportionality"])
+
+            if counters[m]["example"] is None or delta > counters[m]["delta"]:
                 counters[m]["example"] = row["map"]
                 counters[m]["value"] = row[m]
                 counters[m]["disproportionality"] = row["disproportionality"]
+                counters[m]["delta"] = delta
 
 print("Partisan Conflicts Summary:")
 for m in partisan_metrics[1:]:
@@ -83,7 +87,8 @@ for m in partisan_metrics[1:]:
     print(
         f"  across {combos} of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations."
     )
-    print(f"  Example: Map {name} has {sample:.4f} vs. disproportionality {disp:.2%}.")
+    print(f"  Example: Map {name} has {sample:.4f} vs. disproportionality {disp:.4f}.")
+    print()
 print()
 print(
     f"Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'."

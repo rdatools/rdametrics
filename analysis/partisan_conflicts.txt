@@ -1,24 +1,30 @@
 Partisan Conflicts Summary:
 - efficiency_gap: 680,747 of 6,719,956 conflicts (10.1%)
   across 165 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 2500 has 0.0331 vs. disproportionality -4.86%.
+  Example: Map 7460000 has 0.0050 vs. disproportionality -0.1428.
+  
 - seats_bias: 1,510,956 of 6,719,956 conflicts (22.5%)
   across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 2500 has 0.0552 vs. disproportionality -4.86%.
+  Example: Map 29372500 has 0.0930 vs. disproportionality -0.2419.
+
 - votes_bias: 1,509,410 of 6,719,956 conflicts (22.5%)
   across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 2500 has 0.0219 vs. disproportionality -4.86%.
+  Example: Map 40532500 has 0.0389 vs. disproportionality -0.2511.
+
 - geometric_seats_bias: 1,545,812 of 6,719,956 conflicts (23.0%)
   across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 2500 has 0.0322 vs. disproportionality -4.86%.
+  Example: Map 31252500 has 0.0109 vs. disproportionality -0.2466.
+
 - declination: 1,385,292 of 6,719,956 conflicts (20.6%)
   across 165 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 7830000 has 0.2575 vs. disproportionality -0.14%.
+  Example: Map 48322500 has 25.9466 vs. disproportionality -0.1870.
+
 - mean_median_statewide: 1,622,336 of 6,719,956 conflicts (24.1%)
   across 199 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 2500 has 0.0153 vs. disproportionality -4.86%.
+  Example: Map 22570000 has 0.0806 vs. disproportionality -0.2439.
+
 - lopsided_outcomes: 2,042,083 of 6,719,956 conflicts (30.4%)
   across 189 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
-  Example: Map 2500 has 0.1148 vs. disproportionality -4.86%.
+  Example: Map 28310000 has 0.1889 vs. disproportionality -0.2475.
 
 Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'.
