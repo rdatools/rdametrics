@@ -4,7 +4,7 @@
 DO ANY COMBOS HAVE DIFFERENT MAJORITIES IN DIFFERENT ENSEMBLES?
 """
 
-from typing import List, Dict
+from typing import Dict
 
 import os
 import pandas as pd
@@ -17,6 +17,7 @@ from rdametrics import states, chambers, ensembles
 scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 
 df = pd.read_parquet(os.path.expanduser(scores_path))
+ensembles = [e for e in ensembles if e not in ["A1", "A2", "A3", "A4", "Rev*"]]
 
 for xx in states:
     subset_df = df[

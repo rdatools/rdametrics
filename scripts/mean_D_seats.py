@@ -3,8 +3,6 @@
 """
 DEM SEATS BY STATE/CHAMBER COMBO AND ENSEMBLE TYPE
 (the values behind Table 6)
-
-TODO - Something's not right with this Pop-/Pop+ output.
 """
 
 from typing import List, Dict
