@@ -1,10 +1,24 @@
-Partisan Conflicts* Summary:
-- efficiency_gap: 976,689 of 6,719,956 conflicts (14.5%) across 236 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
-- seats_bias: 2,196,201 of 6,719,956 conflicts (32.7%) across 255 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
-- votes_bias: 2,194,088 of 6,719,956 conflicts (32.7%) across 255 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
-- geometric_seats_bias: 2,247,100 of 6,719,956 conflicts (33.4%) across 255 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
-- declination: 1,906,202 of 6,719,956 conflicts (28.4%) across 238 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
-- mean_median_statewide: 2,354,667 of 6,719,956 conflicts (35.0%) across 287 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
-- lopsided_outcomes: 2,961,816 of 6,719,956 conflicts (44.1%) across 273 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations. 
+Partisan Conflicts Summary:
+- efficiency_gap: 680,747 of 6,719,956 conflicts (10.1%)
+       across 165 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 2500 has 0.0331 vs. disproportionality -4.86%.
+- seats_bias: 1,510,956 of 6,719,956 conflicts (22.5%)
+       across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 2500 has 0.0552 vs. disproportionality -4.86%.
+- votes_bias: 1,509,410 of 6,719,956 conflicts (22.5%)
+       across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 2500 has 0.0219 vs. disproportionality -4.86%.
+- geometric_seats_bias: 1,545,812 of 6,719,956 conflicts (23.0%)
+       across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 2500 has 0.0322 vs. disproportionality -4.86%.
+- declination: 1,385,292 of 6,719,956 conflicts (20.6%)
+       across 165 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 7830000 has 0.2575 vs. disproportionality -0.14%.
+- mean_median_statewide: 1,622,336 of 6,719,956 conflicts (24.1%)
+       across 199 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 2500 has 0.0153 vs. disproportionality -4.86%.
+- lopsided_outcomes: 2,042,083 of 6,719,956 conflicts (30.4%)
+       across 189 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
+       Example: Map 2500 has 0.1148 vs. disproportionality -4.86%.
 
-* When the sign of a metric is the opposite of the sign for simple 'disproportionality'.
+Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'.
