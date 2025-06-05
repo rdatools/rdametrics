@@ -39,9 +39,11 @@ categories: List[str] = [
 ]
 
 metrics: Dict[str, List[str]] = {
-    "general": ["population_deviation"],
-    "proportionality": [
+    "general": [
+        "population_deviation",
         "estimated_vote_pct",
+    ],
+    "proportionality": [
         "estimated_seats",
         "pr_deviation",
         "disproportionality",

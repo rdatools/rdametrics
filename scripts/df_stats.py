@@ -19,7 +19,7 @@ scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 df = pd.read_parquet(os.path.expanduser(scores_path))
 
 N = 5
-print("Columns:")
+print(f"Columns {len(df.columns.tolist())}:")
 for col in df.columns.tolist():
     print(f"  {col}")
 print(f"\nFirst {N} rows:")
