@@ -1,0 +1,10 @@
+Partisan Conflicts* Summary:
+- efficiency_gap: 976,689 of 6,719,956 conflicts (14.5%). 
+- seats_bias: 2,196,201 of 6,719,956 conflicts (32.7%). 
+- votes_bias: 2,194,088 of 6,719,956 conflicts (32.7%). 
+- geometric_seats_bias: 2,247,100 of 6,719,956 conflicts (33.4%). 
+- declination: 1,906,202 of 6,719,956 conflicts (28.4%). 
+- mean_median_statewide: 2,354,667 of 6,719,956 conflicts (35.0%). 
+- lopsided_outcomes: 2,961,816 of 6,719,956 conflicts (44.1%). 
+
+* When the sign of a metric is the opposite of the sign for simple 'disproportionality'.
