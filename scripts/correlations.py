@@ -5,17 +5,26 @@ FIND CORRELATIONS BETWEEN METRICS W/IN EACH CATEGORY
 ACROSS STATES, CHAMBERS, AND THE 11 ENSEMBLES
 """
 
-from typing import List, Dict, Any, Set
+from typing import List, Dict
+
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import os
 import pandas as pd
-from collections import defaultdict
+import openpyxl
 
 from rdapy import DISTRICTS_BY_STATE
 from rdametrics import *
 
 
+##########
+
 scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
+output_dir: str = "analysis/correlations"
+
+##########
 
 scores_df = pd.read_parquet(os.path.expanduser(scores_path))
 subset_ensembles = [e for e in ensembles if e not in ["A1", "A2", "A3", "A4", "Rev*"]]
@@ -72,8 +81,33 @@ for category, all_metrics in metrics_by_category.items():
     avg_corr = sum_corr / count_corr
     avg_corr = avg_corr.round(2)
 
-    print(f"Category correlations: {category}")
-    print(avg_corr)
+    # Mark with * the score pairs for which the sign of the correlation is consistent across all combos.
+    avg_corr_marked = avg_corr.copy().round(2)
+    for score1 in subset_metrics:
+        for score2 in subset_metrics:
+            num_pos = len(
+                [
+                    1
+                    for state_chamber in combos
+                    if D[state_chamber].loc[score1, score2] > 0
+                ]
+            )
+            num_neg = len(
+                [
+                    1
+                    for state_chamber in combos
+                    if D[state_chamber].loc[score1, score2] < 0
+                ]
+            )
+            consistent_sign = 1 if num_neg == 0 else -1 if num_pos == 0 else 0
+            if consistent_sign != 0:
+                avg_corr_marked.loc[score1, score2] = (
+                    f"*{avg_corr_marked.loc[score1, score2]}"
+                )
+    avg_corr_marked.to_excel(f"{output_dir}/{category}_avg_corr.xlsx")
+
+    # print(f"Category correlations: {category}")
+    # print(avg_corr)
 
     pass  # for debugging
 
