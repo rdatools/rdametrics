@@ -62,8 +62,8 @@ metrics_by_category: Dict[str, List[str]] = {
         "proportionality",
     ],
     "competitiveness": [
-        "competitive_districts",
         "competitive_district_count",
+        "competitive_districts",
         "average_margin",
         "responsiveness",
         "responsive_districts",
