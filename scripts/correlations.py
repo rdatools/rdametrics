@@ -14,8 +14,8 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 import os
 import pandas as pd
 import openpyxl
+import re
 
-from rdapy import DISTRICTS_BY_STATE
 from rdametrics import *
 
 
@@ -45,6 +45,15 @@ ignore_by_category: Dict[str, List[str]] = {
     "compactness": [],
     "splitting": [],
 }
+
+
+# For generating LaTeX tables
+def stack_string(a):
+    l = re.split(r"[ -]+", a)
+    if len(l) == 1:
+        return l[0]
+    else:
+        return f"\\makecell{{{l[0]} \\\\ {l[1]}}}"
 
 
 for category, all_metrics in metrics_by_category.items():
@@ -117,8 +126,11 @@ for category, all_metrics in metrics_by_category.items():
     print("  Save the average correlation table to Excel ...")
     avg_corr_marked.to_excel(f"{output_dir}/{category}_avg_corr.xlsx")
 
-    # print(f"Category correlations: {category}")
-    # print(avg_corr)
+    print("  Generate LaTex for the table ...")
+    col_dict = {score: stack_string(score) for score in subset_metrics}
+
+    avg_corr_marked.rename(columns=col_dict, inplace=True)
+    avg_corr_marked.to_latex(f"{output_dir}/{category}_avg_corr.tex", escape=False)
 
     pass  # for debugging
 
