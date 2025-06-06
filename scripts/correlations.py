@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-IDENTIFY FREQUENCY OF CONFLICTS BETWEEN METRICS THAT PUPORT TO MEASURE THE DEGREE TO WHICH
-A PLAN FAVORS ONE PARTY OR ANOTHER.
+FIND CORRELATIONS BETWEEN METRICS W/IN EACH CATEGORY
+ACROSS STATES, CHAMBERS, AND THE 11 ENSEMBLES
 """
 
 from typing import List, Dict, Any, Set
@@ -39,14 +39,13 @@ for category, all_metrics in metrics_by_category.items():
     if category == "general":
         continue
 
-    D = dict()  # dictionary mapping (state, chamber) to the correlation table
-
     # Subset the metrics to look at
     subset_metrics: List[str] = [
         m for m in all_metrics if m not in ignore_by_category[category]
     ]
 
     # Find the correlation table for each state-chamber combo for the 11 ensembles
+    D = dict()
     for xx in states:
         for chamber in chambers:
             subset_df = scores_df[
@@ -58,7 +57,7 @@ for category, all_metrics in metrics_by_category.items():
             D[(xx, chamber)] = subset_df.corr(numeric_only=True)
 
     # Average the correlation tables over the state-chamber combinations
-    # (we need some extra code so the average for each cell is over the non-Nan values)
+    # (Need some extra code so the average for each cell is over the non-Nan values)
     sum_corr = pd.DataFrame(0.0, columns=subset_metrics, index=subset_metrics)
     count_corr = pd.DataFrame(0, columns=subset_metrics, index=subset_metrics)
 
