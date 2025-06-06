@@ -12,7 +12,7 @@ import pandas as pd
 from collections import defaultdict
 
 from rdapy import DISTRICTS_BY_STATE
-from rdametrics import states, chambers, ensembles, metrics_by_category
+from rdametrics import *
 
 
 scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
@@ -27,28 +27,37 @@ ignore: List[str] = [
     "turnout_bias",
 ]
 
-D = dict()  # dictionary mapping (state, chamber) to the correlation table
+for category, all_metrics in metrics_by_category.items():
+    if category != "proportionality":  # TODO
+        continue
 
-for xx in states:
-    for chamber in chambers:
-        for category, metrics in metrics_by_category.items():
-            if category != "proportionality":  # TODO
-                continue
+    D = dict()  # dictionary mapping (state, chamber) to the correlation table
+    metrics: List[str] = [c for c in all_metrics if c not in ignore]
 
-            subset_cols: List[str] = [c for c in metrics if c not in ignore]
+    for xx in states:
+        for chamber in chambers:
             subset_df = df[
                 (df["state"] == xx)
                 & (df["chamber"] == chamber)
-                & (df["ensemble"] == "A0")
-            ][subset_cols]
+                # & (df["ensemble"] == "ensemble")
+            ][metrics + ["ensemble"]]
 
             D[(xx, chamber)] = subset_df.corr(numeric_only=True)
 
-    #         break  # for debugging
-    #     break  # for debugging
-    # break  # for debugging
+    sum_corr = pd.DataFrame(0.0, columns=metrics, index=metrics)
+    count_corr = pd.DataFrame(0, columns=metrics, index=metrics)
 
-print(D[("WI", "congress")])
+    for combo in combos:
+        df = D[combo]
+        mask = df.notna()
+        sum_corr += df.fillna(0)
+        count_corr += mask.astype(int)
+
+    avg_corr = sum_corr / count_corr
+    avg_corr = avg_corr.round(2)
+
+    print(f"Category: {category}")
+    print(avg_corr)
 
 pass
 

@@ -5,8 +5,8 @@ CONSTANTS
 from typing import List, Dict
 
 states: List[str] = ["FL", "IL", "MI", "NC", "NY", "OH", "WI"]
-
 chambers: List[str] = ["congress", "upper", "lower"]
+combos = [(state, chamber) for state in states for chamber in chambers]
 
 ensemble_id_to_long_name: Dict[str, str] = {
     "A0": "S0.0_R0_Vcut-edges-rmst",
