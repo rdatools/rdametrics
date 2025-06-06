@@ -38,7 +38,10 @@ ignore_by_category: Dict[str, List[str]] = {
         "turnout_bias",
     ],
     "competitiveness": [],
-    "minority": [],
+    "minority": [
+        "proportional_opportunities",
+        "proportional_coalitions",
+    ],
     "compactness": [],
     "splitting": [],
 }
@@ -48,12 +51,16 @@ for category, all_metrics in metrics_by_category.items():
     if category == "general":
         continue
 
+    print(f"Processing {category} ...")
+
     # Subset the metrics to look at
     subset_metrics: List[str] = [
         m for m in all_metrics if m not in ignore_by_category[category]
     ]
 
-    # Find the correlation table for each state-chamber combo for the 11 ensembles
+    print(
+        "  Find the correlation table for each state-chamber combo and 11 ensembles ..."
+    )
     D = dict()
     for xx in states:
         for chamber in chambers:
@@ -65,23 +72,25 @@ for category, all_metrics in metrics_by_category.items():
 
             D[(xx, chamber)] = subset_df.corr(numeric_only=True)
 
-    # Average the correlation tables over the state-chamber combinations
+    print("  Average the correlation tables over the state-chamber combinations ...")
     # (Need some extra code so the average for each cell is over the non-Nan values)
     sum_corr = pd.DataFrame(0.0, columns=subset_metrics, index=subset_metrics)
     count_corr = pd.DataFrame(0, columns=subset_metrics, index=subset_metrics)
 
-    # Accumulate sum and count of non-NaN entries
+    print("  Accumulate sum and count of non-NaN entries ...")
     for combo in combos:
         combo_df = D[combo]
         mask = combo_df.notna()
         sum_corr += combo_df.fillna(0)
         count_corr += mask.astype(int)
 
-    # Compute average of non-NaN values
+    print("  Compute average of non-NaN values ...")
     avg_corr = sum_corr / count_corr
     avg_corr = avg_corr.round(2)
 
-    # Mark with * the score pairs for which the sign of the correlation is consistent across all combos.
+    print(
+        "Mark score pairs for which the sign of the correlation is consistent across all combos ..."
+    )
     avg_corr_marked = avg_corr.copy().round(2)
     for score1 in subset_metrics:
         for score2 in subset_metrics:
@@ -104,6 +113,8 @@ for category, all_metrics in metrics_by_category.items():
                 avg_corr_marked.loc[score1, score2] = (
                     f"*{avg_corr_marked.loc[score1, score2]}"
                 )
+
+    print("  Save the average correlation table to Excel ...")
     avg_corr_marked.to_excel(f"{output_dir}/{category}_avg_corr.xlsx")
 
     # print(f"Category correlations: {category}")
