@@ -17,7 +17,7 @@ from rdametrics import *
 
 scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
 
-df = pd.read_parquet(os.path.expanduser(scores_path))
+scores_df = pd.read_parquet(os.path.expanduser(scores_path))
 subset_ensembles = [e for e in ensembles if e not in ["A1", "A2", "A3", "A4", "Rev*"]]
 
 ignore_by_category: Dict[str, List[str]] = {
@@ -49,10 +49,10 @@ for category, all_metrics in metrics_by_category.items():
     # Find the correlation table for each state-chamber combo for the 11 ensembles
     for xx in states:
         for chamber in chambers:
-            subset_df = df[
-                (df["state"] == xx)
-                & (df["chamber"] == chamber)
-                & (df["ensemble"].isin(subset_ensembles))
+            subset_df = scores_df[
+                (scores_df["state"] == xx)
+                & (scores_df["chamber"] == chamber)
+                & (scores_df["ensemble"].isin(subset_ensembles))
             ][subset_metrics + ["ensemble"]]
 
             D[(xx, chamber)] = subset_df.corr(numeric_only=True)
@@ -64,9 +64,9 @@ for category, all_metrics in metrics_by_category.items():
 
     # Accumulate sum and count of non-NaN entries
     for combo in combos:
-        df = D[combo]
-        mask = df.notna()
-        sum_corr += df.fillna(0)
+        combo_df = D[combo]
+        mask = combo_df.notna()
+        sum_corr += combo_df.fillna(0)
         count_corr += mask.astype(int)
 
     # Compute average of non-NaN values
@@ -75,6 +75,8 @@ for category, all_metrics in metrics_by_category.items():
 
     print(f"Category correlations: {category}")
     print(avg_corr)
+
+    pass  # for debugging
 
 pass
 
