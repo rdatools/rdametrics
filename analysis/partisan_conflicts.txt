@@ -1,8 +1,10 @@
-Partisan Conflicts Summary:
+Partisan Conflicts Summary
+==========================
+
 - efficiency_gap: 680,747 of 6,719,956 conflicts (10.1%)
   across 165 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
   Example: Map 7460000 has 0.0050 vs. disproportionality -0.1428.
-  
+
 - seats_bias: 1,510,956 of 6,719,956 conflicts (22.5%)
   across 176 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
   Example: Map 29372500 has 0.0930 vs. disproportionality -0.2419.
@@ -26,5 +28,6 @@ Partisan Conflicts Summary:
 - lopsided_outcomes: 2,042,083 of 6,719,956 conflicts (30.4%)
   across 189 of 231 = 7 x 3 x 11 state, chamber, and ensemble combinations.
   Example: Map 28310000 has 0.1889 vs. disproportionality -0.2475.
+
 
 Where a 'conflict' is when the sign of the metric is the *opposite* of the sign for simple 'disproportionality'.
