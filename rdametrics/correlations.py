@@ -31,29 +31,25 @@ ignore_by_category: Dict[str, List[str]] = {
 
 
 def make_correlation_tables(
-    states: List[str], chambers: List[str], scores_df, subset_metrics: List[str]
+    states: List[str], chambers: List[str], scores_df, metrics: List[str]
 ) -> Dict:
     """Make correlation tables for all state-chamber combinations."""
 
     D = dict()
     for xx in states:
         for chamber in chambers:
-            D[(xx, chamber)] = make_correlation_table(
-                xx, chamber, scores_df, subset_metrics
-            )
+            D[(xx, chamber)] = make_correlation_table(xx, chamber, scores_df, metrics)
 
     return D
 
 
-def make_correlation_table(
-    xx: str, chamber: str, scores_df, subset_metrics: List[str]
-) -> Any:
+def make_correlation_table(xx: str, chamber: str, scores_df, metrics: List[str]) -> Any:
     """Create a correlation table for a state-chamber combo and its ensembles."""
     subset_df = scores_df[
         (scores_df["state"] == xx)
         & (scores_df["chamber"] == chamber)
         & (scores_df["ensemble"].isin(correlations_ensembles))
-    ][subset_metrics + ["ensemble"]]
+    ][metrics + ["ensemble"]]
 
     table = subset_df.corr(numeric_only=True)
 
