@@ -30,6 +30,14 @@ ignore_by_category: Dict[str, List[str]] = {
 }
 
 
+def subset_metrics(all_metrics: List[str], category: str) -> List[str]:
+    subset: List[str] = [
+        m for m in all_metrics if m not in ignore_by_category[category]
+    ]
+
+    return subset
+
+
 def make_correlation_tables(
     states: List[str], chambers: List[str], scores_df, metrics: List[str]
 ) -> Dict:
@@ -43,7 +51,9 @@ def make_correlation_tables(
     return D
 
 
-def make_correlation_table(xx: str, chamber: str, scores_df, metrics: List[str]) -> Any:
+def make_correlation_table(
+    xx: str, chamber: str, scores_df, metrics: List[str]
+) -> pd.DataFrame:
     """Create a correlation table for a state-chamber combo and its ensembles."""
     subset_df = scores_df[
         (scores_df["state"] == xx)
@@ -58,7 +68,7 @@ def make_correlation_table(xx: str, chamber: str, scores_df, metrics: List[str])
 
 def average_correlation_tables(
     D: Dict, subset_metrics: List[str], combos: List[Tuple[str, str]]
-) -> Any:
+) -> pd.DataFrame:
     """Average the correlation tables over the state-chamber combinations."""
 
     # Average the correlation tables over the state-chamber combinations
@@ -80,6 +90,38 @@ def average_correlation_tables(
     avg_corr = avg_corr.round(2)
 
     return avg_corr
+
+
+def mark_consistent_signs(
+    avg_corr: pd.DataFrame, D: Dict, metrics: List[str], combos: List[Tuple[str, str]]
+) -> pd.DataFrame:
+    """Mark score pairs for which the sign of the correlation is consistent across all combos"""
+
+    avg_corr_marked = avg_corr.copy().round(2)
+
+    for score1 in metrics:
+        for score2 in metrics:
+            num_pos = len(
+                [
+                    1
+                    for state_chamber in combos
+                    if D[state_chamber].loc[score1, score2] > 0
+                ]
+            )
+            num_neg = len(
+                [
+                    1
+                    for state_chamber in combos
+                    if D[state_chamber].loc[score1, score2] < 0
+                ]
+            )
+            consistent_sign = 1 if num_neg == 0 else -1 if num_pos == 0 else 0
+            if consistent_sign != 0:
+                avg_corr_marked.loc[score1, score2] = (
+                    f"*{avg_corr_marked.loc[score1, score2]}"
+                )
+
+    return avg_corr_marked
 
 
 ### END ###

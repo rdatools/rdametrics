@@ -15,26 +15,23 @@ import os
 import pandas as pd
 import openpyxl
 
-# import re
-
 from rdametrics import (
     states,
     chambers,
     combos,
-    correlations_ensembles,
     metrics_by_category,
-    ignore_by_category,
-    stack_string,
+    subset_metrics,
     make_correlation_tables,
     average_correlation_tables,
+    mark_consistent_signs,
+    stack_string,
 )
 
 
 ##########
 
 scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
-# output_dir: str = "analysis/correlations"
-output_dir: str = "temp"
+output_dir: str = "analysis/correlations"
 
 ##########
 
@@ -44,45 +41,17 @@ for category, all_metrics in metrics_by_category.items():
     if category == "general":
         continue
 
-    subset_metrics: List[str] = [
-        m for m in all_metrics if m not in ignore_by_category[category]
-    ]
+    metrics: List[str] = subset_metrics(all_metrics, category)
 
-    D = make_correlation_tables(states, chambers, scores_df, subset_metrics)
-    avg_corr = average_correlation_tables(D, subset_metrics, combos)
+    D = make_correlation_tables(states, chambers, scores_df, metrics)
 
-    print(
-        "Mark score pairs for which the sign of the correlation is consistent across all combos ..."
-    )
-    avg_corr_marked = avg_corr.copy().round(2)
-    for score1 in subset_metrics:
-        for score2 in subset_metrics:
-            num_pos = len(
-                [
-                    1
-                    for state_chamber in combos
-                    if D[state_chamber].loc[score1, score2] > 0
-                ]
-            )
-            num_neg = len(
-                [
-                    1
-                    for state_chamber in combos
-                    if D[state_chamber].loc[score1, score2] < 0
-                ]
-            )
-            consistent_sign = 1 if num_neg == 0 else -1 if num_pos == 0 else 0
-            if consistent_sign != 0:
-                avg_corr_marked.loc[score1, score2] = (
-                    f"*{avg_corr_marked.loc[score1, score2]}"
-                )
+    avg_corr = average_correlation_tables(D, metrics, combos)
 
-    print("  Save the average correlation table to Excel ...")
+    avg_corr_marked = mark_consistent_signs(avg_corr, D, metrics, combos)
+
     avg_corr_marked.to_excel(f"{output_dir}/{category}_avg_corr.xlsx")
 
-    print("  Generate LaTex for the table ...")
-    col_dict = {score: stack_string(score) for score in subset_metrics}
-
+    col_dict = {score: stack_string(score) for score in metrics}
     avg_corr_marked.rename(columns=col_dict, inplace=True)
     avg_corr_marked.to_latex(f"{output_dir}/{category}_avg_corr.tex", escape=False)
 
