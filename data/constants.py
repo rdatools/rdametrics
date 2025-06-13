@@ -8,25 +8,24 @@ states: List[str] = ["FL", "IL", "MI", "NC", "NY", "OH", "WI"]
 
 chambers: List[str] = ["congress", "upper", "lower"]
 
-ensemble_id_to_long_name: Dict[str, str] = {
-    "A0": "S0.0_R0_Vcut-edges-rmst",
-    "A1": "S0.0_R1_Vcut-edges-rmst",
-    "A2": "S0.0_R2_Vcut-edges-rmst",
-    "A3": "S0.0_R3_Vcut-edges-rmst",
-    "A4": "S0.0_R4_Vcut-edges-rmst",
-    "Pop-": "S0.0_R0_Vcut-edges-rmst",
-    "Pop+": "S0.0_R0_Vcut-edges-rmst",
-    "B": "S0.0_R0_Vdistrict-pairs-rmst",
-    "C": "S0.0_R0_Vcut-edges-ust",
-    "D": "S0.0_R0_Vdistrict-pairs-ust",
-    "Rev*": "S0.0_R0_Vreversible",  # The original 50M sampled every 2.5K ensembles
-    "Rev": "S0.0_R0_Vreversible",  # The revised 1B sampled every 50K ensembles
-    "R25": "S0.25_R0_Vcut-edges-region-aware",
-    "R50": "S0.5_R0_Vcut-edges-region-aware",
-    "R75": "S0.75_R0_Vcut-edges-region-aware",
-    "R100": "S1.0_R0_Vcut-edges-region-aware",
-}
-ensembles: List[str] = list(ensemble_id_to_long_name.keys())
+ensembles: List[str] = [
+    "A0",
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "Pop-",
+    "Pop+",
+    "B",
+    "C",
+    "D",
+    "Rev*",  # The original 50M sampled every 2.5K ensembles
+    "Rev",  # The revised 1B sampled every 50K ensembles
+    "R25",
+    "R50",
+    "R75",
+    "R100",
+]
 
 metrics_by_category: Dict[str, List[str]] = {
     "general": [
@@ -88,5 +87,31 @@ metrics_by_category: Dict[str, List[str]] = {
 metrics: List[str] = [
     metric for category in metrics_by_category.values() for metric in category
 ]
+
+aggregates_by_category = {
+    "census": ["pop_by_district", "district_splitting"],
+    "vap": [
+        "asian_vap",
+        "black_vap",
+        "hispanic_vap",
+        "minority_vap",
+        "native_vap",
+        "pacific_vap",
+        "total_vap",
+        "white_vap",
+    ],
+    "cvap": [
+        "asian_cvap",
+        "black_cvap",
+        "hispanic_cvap",
+        "minority_cvap",
+        "native_cvap",
+        "pacific_cvap",
+        "total_cvap",
+        "white_cvap",
+    ],
+    "election": ["dem_by_district", "tot_by_district"],
+    "shapes": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
+}
 
 ### END ###

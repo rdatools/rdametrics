@@ -19,10 +19,11 @@ import pandas as pd
 from pathlib import Path
 
 from constants import *
+from filenames import get_ensemble_name
 
 
 def main() -> None:
-    """Collect all the 'bydistrict' JSON files into a single unified file."""
+    """Load all the CSV files into a single unified pandas dataframe."""
 
     args = parse_arguments()
 
@@ -127,42 +128,6 @@ def main() -> None:
     )
 
     pass
-
-
-# Helpers to construct ensemble and scores file names, e.g.:
-# NC_lower_T0.05_S0.0_R0_Vcut-edges-rmst_*_scores.csv.xz
-
-
-def get_ensemble_name(xx: str, chamber: str, variant: str) -> str:
-    """Construct an ensemble directory name."""
-
-    T: str
-    if chamber == "congress":
-        if variant == "Pop-":
-            T = "T0.005"
-        elif variant == "Pop+":
-            T = "T0.015"
-        else:
-            T = "T0.01"
-    else:
-        if variant == "Pop-":
-            T = "T0.025"
-        elif variant == "Pop+":
-            T = "T0.075"
-        else:
-            T = "T0.05"
-
-    ensemble_dir: str = f"{xx}_{chamber}_{T}_{ensemble_id_to_long_name[variant]}"
-
-    return ensemble_dir
-
-
-def get_scores_file_name(xx: str, chamber: str, variant: str, scores: str) -> str:
-    """Construct a scores file name."""
-
-    scores_file: str = get_ensemble_name(xx, chamber, variant) + f"_{scores}_scores.csv"
-
-    return scores_file
 
 
 def parse_arguments():
