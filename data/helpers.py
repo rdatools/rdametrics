@@ -15,16 +15,32 @@ def load_scores(scores_path: str) -> pd.DataFrame:
     return df
 
 
-def array_from_scores(
-    xx: str, chamber: str, ensemble: str, metric: str, df: pd.DataFrame
+def arr_from_scores(
+    xx: str, chamber: str, ensemble: str, metric: str, scores_df: pd.DataFrame
 ) -> np.ndarray:
-    """Extract a specific metric from the scores DataFrame into a numpy array."""
+    """Extract a metric for a state, chamber, and ensemble combination from the scores DataFrame into a numpy array."""
 
-    a: np.ndarray = df[
-        (df["state"] == xx) & (df["chamber"] == chamber) & (df["ensemble"] == ensemble)
+    arr: np.ndarray = scores_df[
+        (scores_df["state"] == xx)
+        & (scores_df["chamber"] == chamber)
+        & (scores_df["ensemble"] == ensemble)
     ][metric].to_numpy()
 
-    return a
+    return arr
+
+
+def df_from_scores(
+    xx: str, chamber: str, ensemble: str, scores_df: pd.DataFrame
+) -> pd.DataFrame:
+    """Subset the scores DataFrame for a state, chamber, and ensemble combination."""
+
+    subset_df: pd.DataFrame = scores_df[
+        (scores_df["state"] == xx)
+        & (scores_df["chamber"] == chamber)
+        & (scores_df["ensemble"] == ensemble)
+    ]
+
+    return subset_df
 
 
 ### END ###
