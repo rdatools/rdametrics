@@ -1,5 +1,5 @@
 """
-CONSTANTS USED BY BOTH 'MAKE' SCRIPTS
+CONSTANTS
 """
 
 from typing import Dict, List
