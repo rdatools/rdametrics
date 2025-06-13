@@ -11,6 +11,7 @@ import argparse
 from argparse import ArgumentParser, Namespace
 
 import os
+import json
 import zipfile
 import fnmatch
 import lzma
@@ -87,51 +88,35 @@ def main() -> None:
                                 if fnmatch.fnmatch(f, aggregates_pattern)
                             ]
                             assert (
-                                len(zipped_files) == 6
+                                len(zipped_files) == 5
                             ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
 
                             for aggs_file in zipped_files:
                                 print(f"      Loading {aggs_file} ...")
 
-                                agg_filename: str
                                 if e_id != "Rev":
-                                    agg_filename = Path(aggs_file).stem
                                     xz_data = zf.read(aggs_file)
                                     agg_data = lzma.decompress(xz_data)
                                 else:
-                                    agg_filename = Path(aggs_file).name
                                     agg_data = zf.read(aggs_file)
 
-                                # agg_path = Path(temp_dir) / agg_filename
-                                # with open(agg_path, "wb") as agg_file:
-                                #     agg_file.write(agg_data)
+                                json_objects = [
+                                    json.loads(line)
+                                    for line in agg_data.decode("utf-8")
+                                    .strip()
+                                    .split("\n")
+                                    if line
+                                ]
+                                for obj in json_objects:
+                                    print(obj)
 
-                                # df = pd.read_csv(agg_path)
-                                # category_dfs.append(df)
+                                # TODO
 
                                 i += 1
 
-                            combined_df = category_dfs[0]
-                            for df in category_dfs[1:]:
-                                combined_df = combined_df.merge(
-                                    df, on="map", how="outer"
-                                )
+    print(f"Collecting all {i} bydistrict files ...")  # s.b. 1,680
 
-                            combined_df["state"] = xx
-                            combined_df["chamber"] = chamber
-                            combined_df["ensemble"] = e_id
-
-                            all_aggregates.append(combined_df)
-
-    print(f"Concatenating all {i} scores files ...")  # s.b. 2,106
-    unified_df = pd.concat(all_aggregates, ignore_index=True)
-
-    print(f"Saving unified dataframe to {args.output} ...")
-    unified_df.to_parquet(args.output)
-
-    print(
-        f"The integrated dataframe has {len(unified_df):,} rows and {len(unified_df.columns)} columns"
-    )
+    print(f"Saving unified JSON to {args.output} ...")
 
     pass
 
