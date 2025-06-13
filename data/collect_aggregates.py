@@ -1,11 +1,24 @@
 #!/usr/bin/env python3
 
 """
-TODO - Make by-district info ...
+MAKE A SINGLE, INTEGRATED AGGREGATES JSONL FILE
+
+To use this script:
+
+(1) Put all 22 zip files in a directory (7 x 3 = 21 xx_chamber zips + 1 reversible.long zip).
+
+(2) Run the script:
+    ```
+    data/collect_aggregates.py \
+    --input /path/to/zip/directory \
+    --output /path/to/aggregates.jsonl
+    ```
+
+(3) Zip the README.md together with the .jsonl file and upload it to the download server.
 
 """
 
-from typing import Dict, List, Set, Tuple, Any
+from typing import Dict, List, Set, Any
 
 import argparse
 from argparse import ArgumentParser, Namespace
@@ -17,7 +30,7 @@ import fnmatch
 import lzma
 import tempfile
 
-from rdapy import smart_write, write_record, MetadataRecord
+from rdapy import smart_write, write_record
 
 from constants import *
 from filenames import get_ensemble_name
@@ -41,6 +54,7 @@ def main() -> None:
                     for e_id in ensembles:
 
                         # Toggle between the two types of zips
+
                         if zip_type == "xx_chamber" and e_id == "Rev":
                             continue
                         if zip_type == "reversible.long" and e_id != "Rev":
