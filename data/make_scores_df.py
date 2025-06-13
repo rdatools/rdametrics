@@ -17,7 +17,7 @@ To use this script:
     `pip install pyarrow`
 
 (4) Run the script:
-    `python3 scores_df.py`
+    `python3 make_scores_df.py`
 
 (5) Zip the README.md together with the .parquet file and upload it to the download server.
 
