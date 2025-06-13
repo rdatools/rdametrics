@@ -22,7 +22,7 @@ from constants import *
 
 
 def main() -> None:
-    """Load all the CSV files into a single unified pandas dataframe."""
+    """Collect all the 'bydistrict' JSON files into a single unified file."""
 
     args = parse_arguments()
 
