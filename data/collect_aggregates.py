@@ -205,6 +205,7 @@ def extract_aggregates(
         assert "_tag_" in record, "Record does not contain '_tag_' key"
         if record["_tag_"] == "metadata":
             metadata = record
+            continue
 
         assert (
             record["_tag_"] == "by-district"
