@@ -40,7 +40,7 @@ from filenames import get_ensemble_name
 
 
 def main() -> None:
-    """Load all the CSV files into a single unified pandas dataframe."""
+    """Load all the scores CSV files into a single unified pandas dataframe."""
 
     args = parse_arguments()
 

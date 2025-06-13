@@ -5,7 +5,7 @@ TODO - Make by-district info ...
 
 """
 
-from typing import List, Set
+from typing import Dict, List, Set, Any
 
 import argparse
 from argparse import ArgumentParser, Namespace
@@ -23,20 +23,24 @@ from filenames import get_ensemble_name
 
 
 def main() -> None:
-    """Load all the CSV files into a single unified pandas dataframe."""
+    """Load all the by-district JSONL files into a single unified JSON file."""
 
     args = parse_arguments()
 
     i: int = 0
-    all_scores = []
+    all_aggregates: Dict[str, Any] = dict()
 
     for zip_type in [
         "xx_chamber",  # The 21 xx_chamber zips
         "reversible.long",  # The reversible.long zip
     ]:
-        scores_files: Set[str] = set()
+        bydistrict_files: Set[str] = set()
         for xx in states:
+            all_aggregates[xx] = dict()
+
             for chamber in chambers:
+                all_aggregates[xx][chamber] = dict()
+
                 for e_id in ensembles:
                     # The long run reversible is not in the xx_chamber zips
                     if zip_type == "xx_chamber" and e_id == "Rev":
@@ -44,6 +48,8 @@ def main() -> None:
                     # The reversible.long zip only contains the long run reversible
                     if zip_type == "reversible.long" and e_id != "Rev":
                         continue
+
+                    all_aggregates[xx][chamber][e_id] = dict()
 
                     zip_path: str
                     if zip_type == "xx_chamber":
@@ -55,7 +61,7 @@ def main() -> None:
                             f"{args.input}/reversible.long.zip"
                         )
 
-                    # Read the scores CSVs from the zip files.
+                    # Read the bydistrict JSONL files from the zips.
                     # To keep this nested xx / chamber / e__id looping simple,
                     # it cracks the same {xx}_{chamber} zip file repeatedly.
 
@@ -63,46 +69,46 @@ def main() -> None:
                         with zipfile.ZipFile(zip_path) as zf:
                             ensemble_name: str = get_ensemble_name(xx, chamber, e_id)
                             assert (
-                                ensemble_name not in scores_files
+                                ensemble_name not in bydistrict_files
                             ), f"Duplicate ensemble name {ensemble_name} found in {zip_path}"
-                            scores_files.add(ensemble_name)
+                            bydistrict_files.add(ensemble_name)
 
                             # The file names w/in the zip files
-                            scores_pattern: str = "*_scores.csv"
+                            aggregates_pattern: str = "*_bydistrict.jsonl"
                             if e_id != "Rev":
-                                scores_pattern = f"{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{scores_pattern}.xz"
+                                aggregates_pattern = f"{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}.xz"
                             else:
-                                scores_pattern = f"reversible.long/{xx}/{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{scores_pattern}"
+                                aggregates_pattern = f"reversible.long/{xx}/{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}"
 
                             zipped_files: List[str] = zf.namelist()
                             zipped_files = [
                                 f
                                 for f in zipped_files
-                                if fnmatch.fnmatch(f, scores_pattern)
+                                if fnmatch.fnmatch(f, aggregates_pattern)
                             ]
                             assert (
                                 len(zipped_files) == 6
-                            ), f"Expected 6 scores files, found {len(zipped_files)}"
+                            ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
 
-                            category_dfs = []
-                            for scores_file in zipped_files:
-                                print(f"      Loading {scores_file} ...")
+                            for aggs_file in zipped_files:
+                                print(f"      Loading {aggs_file} ...")
 
-                                csv_filename: str
+                                agg_filename: str
                                 if e_id != "Rev":
-                                    csv_filename = Path(scores_file).stem
-                                    xz_data = zf.read(scores_file)
-                                    csv_data = lzma.decompress(xz_data)
+                                    agg_filename = Path(aggs_file).stem
+                                    xz_data = zf.read(aggs_file)
+                                    agg_data = lzma.decompress(xz_data)
                                 else:
-                                    csv_filename = Path(scores_file).name
-                                    csv_data = zf.read(scores_file)
+                                    agg_filename = Path(aggs_file).name
+                                    agg_data = zf.read(aggs_file)
 
-                                csv_path = Path(temp_dir) / csv_filename
-                                with open(csv_path, "wb") as csv_file:
-                                    csv_file.write(csv_data)
+                                # agg_path = Path(temp_dir) / agg_filename
+                                # with open(agg_path, "wb") as agg_file:
+                                #     agg_file.write(agg_data)
 
-                                df = pd.read_csv(csv_path)
-                                category_dfs.append(df)
+                                # df = pd.read_csv(agg_path)
+                                # category_dfs.append(df)
+
                                 i += 1
 
                             combined_df = category_dfs[0]
@@ -115,10 +121,10 @@ def main() -> None:
                             combined_df["chamber"] = chamber
                             combined_df["ensemble"] = e_id
 
-                            all_scores.append(combined_df)
+                            all_aggregates.append(combined_df)
 
     print(f"Concatenating all {i} scores files ...")  # s.b. 2,106
-    unified_df = pd.concat(all_scores, ignore_index=True)
+    unified_df = pd.concat(all_aggregates, ignore_index=True)
 
     print(f"Saving unified dataframe to {args.output} ...")
     unified_df.to_parquet(args.output)
