@@ -29,29 +29,22 @@ def main() -> None:
     args = parse_arguments()
 
     i: int = 0
-    all_aggregates: Dict[str, Any] = dict()
-
     with smart_write(args.output) as aggregates_stream:
         for zip_type in [
             "xx_chamber",  # The 21 xx_chamber zips
             "reversible.long",  # The reversible.long zip
         ]:
-            bydistrict_files: Set[str] = set()
+            bydistrict_files: Set[str] = set()  # Ensure each is processed only once
+
             for xx in states:
-                all_aggregates[xx] = dict()
-
                 for chamber in chambers:
-                    all_aggregates[xx][chamber] = dict()
-
                     for e_id in ensembles:
-                        # The long run reversible is not in the xx_chamber zips
+
+                        # Toggle between the two types of zips
                         if zip_type == "xx_chamber" and e_id == "Rev":
                             continue
-                        # The reversible.long zip only contains the long run reversible
                         if zip_type == "reversible.long" and e_id != "Rev":
                             continue
-
-                        # all_aggregates[xx][chamber][e_id] = dict()
 
                         zip_path: str
                         if zip_type == "xx_chamber":
@@ -69,7 +62,8 @@ def main() -> None:
 
                         with tempfile.TemporaryDirectory() as temp_dir:
                             with zipfile.ZipFile(zip_path) as zf:
-                                # Get the by-district file names; make sure they're only processed once each
+
+                                # Get the by-district file names
 
                                 ensemble_name: str = get_ensemble_name(
                                     xx, chamber, e_id
@@ -186,6 +180,7 @@ def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
 
     for i, record in enumerate(data):
         assert "_tag_" in record, "Record does not contain '_tag_' key"
+
         if record["_tag_"] == "metadata":
             continue
 

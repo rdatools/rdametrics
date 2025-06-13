@@ -88,7 +88,7 @@ metrics: List[str] = [
     metric for category in metrics_by_category.values() for metric in category
 ]
 
-aggregates_by_dataset_type = {
+aggregates_by_dataset = {
     "census": ["pop_by_district", "district_splitting"],
     "vap": [
         "asian_vap",
@@ -113,5 +113,8 @@ aggregates_by_dataset_type = {
     "election": ["dem_by_district", "tot_by_district"],
     "shapes": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
 }
+aggregates: List[str] = [
+    agg for category in aggregates_by_dataset.values() for agg in category
+]
 
 ### END ###
