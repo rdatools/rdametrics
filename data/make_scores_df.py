@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Create and save a single, integrated pandas dataframe that contains all the scores
-from all the "Beta" scores CSV files in all the state & chamber ensembles.
+MAKE A SINGLE, INTEGRATED SCORES DATAFRAME
 
 To use this script:
 
@@ -23,7 +22,7 @@ To use this script:
 
 """
 
-from typing import List, Dict, Set
+from typing import List, Set
 
 import argparse
 from argparse import ArgumentParser, Namespace
