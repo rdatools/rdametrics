@@ -55,10 +55,11 @@ def main() -> None:
         for xx in states:
             for chamber in chambers:
                 for e_id in ensembles:
-                    # The long run reversible is not in the xx_chamber zips
+
+                    # Toggle between the two types of zips
+
                     if zip_type == "xx_chamber" and e_id == "Rev":
                         continue
-                    # The reversible.long zip only contains the long run reversible
                     if zip_type == "reversible.long" and e_id != "Rev":
                         continue
 
@@ -78,13 +79,15 @@ def main() -> None:
 
                     with tempfile.TemporaryDirectory() as temp_dir:
                         with zipfile.ZipFile(zip_path) as zf:
+
+                            # Get the by-district file names
+
                             ensemble_name: str = get_ensemble_name(xx, chamber, e_id)
                             assert (
                                 ensemble_name not in scores_files
                             ), f"Duplicate ensemble name {ensemble_name} found in {zip_path}"
                             scores_files.add(ensemble_name)
 
-                            # The file names w/in the zip files
                             scores_pattern: str = "*_scores.csv"
                             if e_id != "Rev":
                                 scores_pattern = f"{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{scores_pattern}.xz"
@@ -100,6 +103,8 @@ def main() -> None:
                             assert (
                                 len(zipped_files) == 6
                             ), f"Expected 6 scores files, found {len(zipped_files)}"
+
+                            # Read each file & collect the scores
 
                             category_dfs = []
                             for scores_file in zipped_files:
