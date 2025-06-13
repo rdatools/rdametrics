@@ -88,7 +88,7 @@ metrics: List[str] = [
     metric for category in metrics_by_category.values() for metric in category
 ]
 
-aggregates_by_category = {
+aggregates_by_dataset_type = {
     "census": ["pop_by_district", "district_splitting"],
     "vap": [
         "asian_vap",

@@ -28,6 +28,21 @@ def main() -> None:
 
     args = parse_arguments()
 
+    agg_types: List[str] = [
+        "general",
+        "partisan",
+        "minority",
+        "compactness",
+        "splitting",
+    ]
+    datasets_by_type: Dict[str, List[str]] = {
+        "general": ["census"],
+        "partisan": ["election"],
+        "minority": ["vap", "cvap"],
+        "compactness": ["shapes"],
+        "splitting": ["census"],
+    }
+
     i: int = 0
     all_aggregates: Dict[str, Any] = dict()
 
@@ -92,7 +107,16 @@ def main() -> None:
                             ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
 
                             for aggs_file in zipped_files:
-                                print(f"      Loading {aggs_file} ...")
+                                agg_type = next(
+                                    (s for s in agg_types if s in aggs_file),
+                                    None,
+                                )
+                                assert (
+                                    agg_type is not None
+                                ), f"Unknown aggregate type in {aggs_file}"
+                                print(
+                                    f"      Loading {agg_type} aggregates: {aggs_file} ..."
+                                )
 
                                 if e_id != "Rev":
                                     xz_data = zf.read(aggs_file)
