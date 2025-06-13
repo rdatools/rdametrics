@@ -5,7 +5,7 @@ TODO - Make by-district info ...
 
 """
 
-from typing import Dict, List, Set, Any
+from typing import Dict, List, Set, Tuple, Any
 
 import argparse
 from argparse import ArgumentParser, Namespace
@@ -16,9 +16,6 @@ import zipfile
 import fnmatch
 import lzma
 import tempfile
-
-# import pandas as pd
-# from pathlib import Path
 
 from rdapy import smart_write, write_record, MetadataRecord
 
@@ -72,6 +69,8 @@ def main() -> None:
 
                         with tempfile.TemporaryDirectory() as temp_dir:
                             with zipfile.ZipFile(zip_path) as zf:
+                                # Get the by-district file names; make sure they're only processed once each
+
                                 ensemble_name: str = get_ensemble_name(
                                     xx, chamber, e_id
                                 )
@@ -80,7 +79,6 @@ def main() -> None:
                                 ), f"Duplicate ensemble name {ensemble_name} found in {zip_path}"
                                 bydistrict_files.add(ensemble_name)
 
-                                # The file names w/in the zip files
                                 aggregates_pattern: str = "*_bydistrict.jsonl"
                                 if e_id != "Rev":
                                     aggregates_pattern = f"{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}.xz"
@@ -97,11 +95,14 @@ def main() -> None:
                                     len(zipped_files) == 5
                                 ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
 
-                                # Collect & concatenate the aggregates from different files
+                                # Read each file & collect the aggregates
+
                                 aggregate_pieces: List[Dict[str, Dict[str, Any]]] = (
                                     list()
                                 )
-                                for aggs_file in zipped_files:
+                                first_metadata: Dict[str, Any]
+
+                                for j, aggs_file in enumerate(zipped_files):
                                     agg_type = next(
                                         (s for s in agg_types if s in aggs_file),
                                         None,
@@ -110,7 +111,7 @@ def main() -> None:
                                         agg_type is not None
                                     ), f"Unknown aggregate type in {aggs_file}"
                                     print(
-                                        f"      Loading {agg_type} aggregates: {aggs_file} ..."
+                                        f"  Loading {agg_type} aggregates: {aggs_file} ..."
                                     )
 
                                     if e_id != "Rev":
@@ -122,16 +123,31 @@ def main() -> None:
                                     json_objects: List[Dict[str, Any]] = decode_bytes(
                                         agg_data
                                     )
-                                    # TODO - Grab the metadata from the first record of the first file
-                                    aggregate_pieces.append(
-                                        extract_aggregates(json_objects, agg_type)
+
+                                    agg_partial: Dict[str, Dict[str, Any]]
+                                    metadata: Dict[str, Any]
+                                    agg_partial, metadata = extract_aggregates(
+                                        json_objects, agg_type
                                     )
+                                    aggregate_pieces.append(agg_partial)
+                                    if j == 0:
+                                        first_metadata = metadata
 
                                     i += 1
+
+                                # Merge the aggregates from all files
 
                                 aggs_for_plans: Dict[str, Dict[str, Any]] = (
                                     merge_aggregates(aggregate_pieces)
                                 )
+
+                                # Write the metadata and combined aggregates to the output stream
+
+                                metadata_record: MetadataRecord = {
+                                    "_tag_": "metadata",
+                                    "properties": first_metadata,
+                                }
+                                write_record(metadata_record, aggregates_stream)
                                 for name, aggs in aggs_for_plans.items():
                                     record: Dict[str, Any] = {
                                         "_tag_": "by-district",
@@ -139,8 +155,6 @@ def main() -> None:
                                         "aggregates": aggs,
                                     }
                                     write_record(record, aggregates_stream)
-
-            break  # TODO - Remove
 
     print(f"Collecting all {i} bydistrict files ...")  # s.b. 1,680
 
@@ -179,15 +193,22 @@ def decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
     return json_objects
 
 
-def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
+def extract_aggregates(
+    data, agg_type: str
+) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
     """Extract the by-district aggregates from the raw data. Ignore datasets & dataset types. Assume one dataset per type."""
 
     aggregates_by_name: Dict[str, Dict[str, Any]] = dict()
+    metadata: Dict[str, Any] = dict()
 
     for i, record in enumerate(data):
         assert "_tag_" in record, "Record does not contain '_tag_' key"
-        if record["_tag_"] != "by-district":
-            continue
+        if record["_tag_"] == "metadata":
+            metadata = record
+
+        assert (
+            record["_tag_"] == "by-district"
+        ), f"Record does not contain '_tag_' key with value 'by-district': {record}"
 
         name: str = record["name"]
 
@@ -205,26 +226,22 @@ def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
 
         aggregates_by_name[name] = collection
 
-    return aggregates_by_name
+    return aggregates_by_name, metadata
 
 
-# TODO
 def merge_aggregates(
     separate_aggs: List[Dict[str, Dict[str, Any]]],
 ) -> Dict[str, Dict[str, Any]]:
     """Merge the separate aggregates together."""
 
     all_names = set().union(*separate_aggs)
-    result = {name: {} for name in sorted(all_names)}
+    merged = {name: {} for name in sorted(all_names)}
 
     for d in separate_aggs:
         for name, info in d.items():
-            result[name].update(info)
+            merged[name].update(info)
 
-    # aggregates = [{"name": name, **info} for name, info in result.items()]
-
-    # return aggregates
-    return result
+    return merged
 
 
 def parse_arguments():
