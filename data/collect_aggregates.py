@@ -28,21 +28,6 @@ def main() -> None:
 
     args = parse_arguments()
 
-    agg_types: List[str] = [
-        "general",
-        "partisan",
-        "minority",
-        "compactness",
-        "splitting",
-    ]
-    datasets_by_type: Dict[str, List[str]] = {
-        "general": ["census"],
-        "partisan": ["election"],
-        "minority": ["vap", "cvap"],
-        "compactness": ["shapes"],
-        "splitting": ["census"],
-    }
-
     i: int = 0
     all_aggregates: Dict[str, Any] = dict()
 
@@ -106,6 +91,8 @@ def main() -> None:
                                 len(zipped_files) == 5
                             ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
 
+                            # Collect & concatenate the aggregates from different files
+                            aggregates: List[Dict[str, Dict[str, Any]]] = list()
                             for aggs_file in zipped_files:
                                 agg_type = next(
                                     (s for s in agg_types if s in aggs_file),
@@ -124,25 +111,80 @@ def main() -> None:
                                 else:
                                     agg_data = zf.read(aggs_file)
 
-                                json_objects = [
-                                    json.loads(line)
-                                    for line in agg_data.decode("utf-8")
-                                    .strip()
-                                    .split("\n")
-                                    if line
-                                ]
-                                for obj in json_objects:
-                                    print(obj)
-
-                                # TODO
+                                json_objects: List[Dict[str, Any]] = decode_bytes(
+                                    agg_data
+                                )
+                                aggregates.append(
+                                    extract_aggregates(json_objects, agg_type)
+                                )
 
                                 i += 1
+
+                            pass  # for debugging
+                            # TODO - HERE
 
     print(f"Collecting all {i} bydistrict files ...")  # s.b. 1,680
 
     print(f"Saving unified JSON to {args.output} ...")
 
     pass
+
+
+### HELPERS ###
+
+agg_types: List[str] = [
+    "general",
+    "partisan",
+    "minority",
+    "compactness",
+    "splitting",
+]
+datasets_by_type: Dict[str, List[str]] = {
+    "general": ["census"],
+    "partisan": ["election"],
+    "minority": ["vap", "cvap"],
+    "compactness": ["shapes"],
+    "splitting": ["census"],
+}
+
+
+def decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
+    """Decode the bytes from a zipped by-district JSONL file."""
+
+    json_objects = [
+        json.loads(line) for line in bytes.decode("utf-8").strip().split("\n") if line
+    ]
+
+    return json_objects
+
+
+def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
+    """Extract the by-district aggregates from the raw data. Ignore datasets & dataset types. Assume one dataset per type."""
+
+    aggregates: Dict[str, Dict[str, Any]] = dict()
+
+    for i, record in enumerate(data):
+        assert "_tag_" in record, "Record does not contain '_tag_' key"
+        if record["_tag_"] != "by-district":
+            continue
+
+        name: str = record["name"]
+
+        collection: Dict[str, Any] = dict()
+        for dataset in datasets_by_type[agg_type]:
+            # Skip over the dataset type and dataset name
+            aggs_list: List[Dict[str, List[Any]]] = record["by-district"][
+                dataset
+            ].values()
+            # Make the aggregates a single dictionary again
+            aggs_dict: Dict[str, List[Any]] = {
+                k: v for agg in aggs_list for k, v in agg.items()
+            }
+            collection.update(aggs_dict)
+
+        aggregates[name] = collection
+
+    return aggregates
 
 
 def parse_arguments():
