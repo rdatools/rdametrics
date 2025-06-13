@@ -7,23 +7,26 @@ from all the "Beta" scores CSV files in all the state & chamber ensembles.
 To use this script:
 
 (1) Put all 22 zip files in a directory (7 x 3 = 21 xx_chamber zips + 1 reversible.long zip).
-    Change the `zipped_root` variable below to point to that directory.
 
-(2) Change the `output_path` variable below to be the fully qualified path where you want the
-    resulting .parquet file to be saved.
-
-(3) Install dependencies:
+(2) Install dependencies:
     `pip install pandas`
     `pip install pyarrow`
 
-(4) Run the script:
-    `python3 make_scores_df.py`
+(3) Run the script:
+    ```
+    data/make_scores_df.py \
+    --input /path/to/zip/directory \
+    --output /path/to/scores.parquet
+    ```
 
-(5) Zip the README.md together with the .parquet file and upload it to the download server.
+(4) Zip the README.md together with the .parquet file and upload it to the download server.
 
 """
 
 from typing import List, Dict, Set
+
+import argparse
+from argparse import ArgumentParser, Namespace
 
 import os
 import zipfile
@@ -33,46 +36,13 @@ import tempfile
 import pandas as pd
 from pathlib import Path
 
-######### Change these values #########
-
-zipped_root: str = "~/local/beta-ensembles/zipped"
-output_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
-
-#######################################
-
-states: List[str] = ["FL", "IL", "MI", "NC", "NY", "OH", "WI"]
-chambers: List[str] = ["congress", "upper", "lower"]
-ensemble_id_to_long_name: Dict[str, str] = {
-    "A0": "S0.0_R0_Vcut-edges-rmst",
-    "A1": "S0.0_R1_Vcut-edges-rmst",
-    "A2": "S0.0_R2_Vcut-edges-rmst",
-    "A3": "S0.0_R3_Vcut-edges-rmst",
-    "A4": "S0.0_R4_Vcut-edges-rmst",
-    "Pop-": "S0.0_R0_Vcut-edges-rmst",
-    "Pop+": "S0.0_R0_Vcut-edges-rmst",
-    "B": "S0.0_R0_Vdistrict-pairs-rmst",
-    "C": "S0.0_R0_Vcut-edges-ust",
-    "D": "S0.0_R0_Vdistrict-pairs-ust",
-    "Rev*": "S0.0_R0_Vreversible",  # The original 50M sampled every 2.5K ensembles
-    "Rev": "S0.0_R0_Vreversible",  # The revised 1B sampled every 50K ensembles
-    "R25": "S0.25_R0_Vcut-edges-region-aware",
-    "R50": "S0.5_R0_Vcut-edges-region-aware",
-    "R75": "S0.75_R0_Vcut-edges-region-aware",
-    "R100": "S1.0_R0_Vcut-edges-region-aware",
-}
-ensembles: List[str] = list(ensemble_id_to_long_name.keys())
-categories: List[str] = [
-    "general",
-    "partisan",
-    "minority",
-    "compactness",
-    "splitting",
-    "mmd",
-]
+from constants import *
 
 
 def main() -> None:
     """Load all the CSV files into a single unified pandas dataframe."""
+
+    args = parse_arguments()
 
     i: int = 0
     all_scores = []
@@ -95,11 +65,11 @@ def main() -> None:
                     zip_path: str
                     if zip_type == "xx_chamber":
                         zip_path = os.path.expanduser(
-                            f"{zipped_root}/{xx}_{chamber}.zip"
+                            f"{args.input}/{xx}_{chamber}.zip"
                         )
                     else:
                         zip_path = os.path.expanduser(
-                            f"{zipped_root}/reversible.long.zip"
+                            f"{args.input}/reversible.long.zip"
                         )
 
                     # Read the scores CSVs from the zip files.
@@ -167,8 +137,8 @@ def main() -> None:
     print(f"Concatenating all {i} scores files ...")  # s.b. 2,106
     unified_df = pd.concat(all_scores, ignore_index=True)
 
-    print(f"Saving unified dataframe to {output_path} ...")
-    unified_df.to_parquet(output_path)
+    print(f"Saving unified dataframe to {args.output} ...")
+    unified_df.to_parquet(args.output)
 
     print(
         f"The integrated dataframe has {len(unified_df):,} rows and {len(unified_df.columns)} columns"
@@ -213,43 +183,34 @@ def get_scores_file_name(xx: str, chamber: str, variant: str, scores: str) -> st
     return scores_file
 
 
-"""
-# This is the code I originally used to read the scores CSVs from the 22 zip files
-# that were all unzipped in same place.
+def parse_arguments():
+    """Parse command line arguments."""
 
-unzipped_root: str = "~/local/beta-ensembles/unzipped"
-
-ensemble_path: str
-if e_id != "Rev":
-    ensemble_path = (
-        os.path.expanduser(unzipped_root)
-        + f"/{xx}_{chamber}/"
+    parser: ArgumentParser = argparse.ArgumentParser(
+        description="Parse command line arguments."
     )
-else:
-    ensemble_path = (
-        os.path.expanduser(unzipped_root)
-        + f"/reversible.long/{xx}"  # Extra level of hierarchy in the zip file
-        + f"/{xx}_{chamber}/"
+
+    parser.add_argument(
+        "--input",
+        type=str,
+        required=True,
+        help="The directory containing the input .zip files",
     )
-ensemble_path += get_ensemble_name(xx, chamber, e_id)
-
-for category in categories:
-    scores_file: str = (
-        ensemble_path
-        + "/"
-        + get_scores_file_name(xx, chamber, e_id, category)
+    parser.add_argument(
+        "--output",
+        type=str,
+        required=True,
+        help="The path to the output .parquet file",
     )
-    print(f"      Loading {scores_file} ...")
 
-    df = pd.read_csv(scores_file)
-    df["state"] = xx
-    df["chamber"] = chamber
-    df["ensemble"] = e_id
-    # df["category"] = category
+    parser.add_argument("--debug", dest="debug", action="store_true", help="Debug mode")
+    parser.add_argument(
+        "-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode"
+    )
 
-    all_scores.append(df)
+    args: Namespace = parser.parse_args()
 
-"""
+    return args
 
 
 if __name__ == "__main__":
