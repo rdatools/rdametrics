@@ -17,6 +17,8 @@ from constants import (
     states,
     chambers,
     ensembles,
+    metrics,
+    aggregates,
     aggregate_categories,
     datasets_by_aggregate_category,
 )
@@ -34,28 +36,37 @@ def load_scores(scores_path: str) -> pd.DataFrame:
 
 
 def arr_from_scores(
-    xx: str, chamber: str, ensemble: str, metric: str, scores_df: pd.DataFrame
+    xx: str, chamber: str, ensemble: str, metric: str, scores: pd.DataFrame
 ) -> np.ndarray:
     """Extract a metric for a state, chamber, and ensemble combination from the scores DataFrame into a numpy array."""
 
-    arr: np.ndarray = scores_df[
-        (scores_df["state"] == xx)
-        & (scores_df["chamber"] == chamber)
-        & (scores_df["ensemble"] == ensemble)
+    assert xx in states, f"Invalid state: {xx}"
+    assert chamber in chambers, f"Invalid chamber: {chamber}"
+    assert ensemble in ensembles, f"Invalid ensemble: {ensemble}"
+    assert metric in metrics, f"Invalid metric: {metric}"
+
+    arr: np.ndarray = scores[
+        (scores["state"] == xx)
+        & (scores["chamber"] == chamber)
+        & (scores["ensemble"] == ensemble)
     ][metric].to_numpy()
 
     return arr
 
 
 def df_from_scores(
-    xx: str, chamber: str, ensemble: str, scores_df: pd.DataFrame
+    xx: str, chamber: str, ensemble: str, scores: pd.DataFrame
 ) -> pd.DataFrame:
     """Subset the scores DataFrame for a state, chamber, and ensemble combination."""
 
-    subset_df: pd.DataFrame = scores_df[
-        (scores_df["state"] == xx)
-        & (scores_df["chamber"] == chamber)
-        & (scores_df["ensemble"] == ensemble)
+    assert xx in states, f"Invalid state: {xx}"
+    assert chamber in chambers, f"Invalid chamber: {chamber}"
+    assert ensemble in ensembles, f"Invalid ensemble: {ensemble}"
+
+    subset_df: pd.DataFrame = scores[
+        (scores["state"] == xx)
+        & (scores["chamber"] == chamber)
+        & (scores["ensemble"] == ensemble)
     ]
 
     return subset_df
@@ -112,21 +123,41 @@ def load_aggregates(
             else:
                 agg_data = zf.read(aggs_file)
 
-            json_objects: List[Dict[str, Any]] = decode_bytes(agg_data)
+            json_objects: List[Dict[str, Any]] = _decode_bytes(agg_data)
 
-            aggregate_data: List[Dict[str, Any]] = extract_aggregates(
+            aggregate_data: List[Dict[str, Any]] = _extract_aggregates(
                 json_objects, category
             )
 
     return aggregate_data
 
 
-# TODO - Add arr_from_aggregates function to extract a specific aggregate from the by-district aggregates data.
+def arr_from_aggregates(
+    aggregate: str,
+    loaded_aggregates: List[Dict[str, Any]],
+    *,
+    include_statewide: bool = False,
+) -> np.ndarray:
+    """
+    Extract an aggregrate the loaded aggregates for a state, chamber, ensemble, and aggregate category.
+    Returns a 2D numpy array where each row corresponds to a plan and each column corresponds to a district.
+    """
+
+    assert aggregate in aggregates, f"Invalid aggregate: {aggregate}"
+    assert (
+        aggregate in loaded_aggregates[0]
+    ), f"Aggregate {aggregate} not found in loaded aggregates"
+
+    index: int = 0 if include_statewide else 1
+    result: List = [r[aggregate][index:] for r in loaded_aggregates]
+
+    return np.array(result)
+
 
 ### HELPERS ###
 
 
-def decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
+def _decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
     """Decode the bytes from a zipped by-district JSONL file."""
 
     json_objects = [
@@ -136,7 +167,7 @@ def decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
     return json_objects
 
 
-def extract_aggregates(
+def _extract_aggregates(
     data, category: str, minority_dataset: str = "VAP"
 ) -> List[Dict[str, Any]]:
     """Extract the by-district aggregates from the raw data. Ignore datasets & dataset types. Assume one dataset per type."""
