@@ -1,21 +1,7 @@
 #!/usr/bin/env python3
 
 """
-MAKE A SINGLE, INTEGRATED AGGREGATES JSONL FILE
-
-To use this script:
-
-(1) Put all 22 zip files in a directory (7 x 3 = 21 xx_chamber zips + 1 reversible.long zip).
-
-(2) Run the script:
-    ```
-    data/collect_aggregates.py \
-    --input /path/to/zip/directory \
-    --output /path/to/aggregates.jsonl
-    ```
-
-(3) Zip the README.md together with the .jsonl file and upload it to the download server.
-
+TEST HARNESS TO LOAD THE AGGREGATES FOR A STATE, CHAMBER, ENSEMBLE, AND AGGREGATE-TYPE COMBINATION
 """
 
 from typing import Dict, List, Set, Any
@@ -32,149 +18,31 @@ import tempfile
 
 from rdapy import smart_write, write_record
 
-from constants import *
+from constants import states, chambers, ensembles, aggregates
 from filenames import get_ensemble_name
 
+# ARGS
 
-def main() -> None:
-    """Load all the by-district JSONL files into a single unified JSON file."""
+zip_dir: str = "~/local/beta-ensembles/zipped"
+xx: str = "NC"
+chamber: str = "congress"
+ensemble: str = "A0"
+category: str = "partisan"
 
-    args = parse_arguments()
+aggregate: str = "dem_by_district"
 
-    i: int = 0
-    with smart_write(args.output) as aggregates_stream:
-        for zip_type in [
-            "xx_chamber",  # The 21 xx_chamber zips
-            "reversible.long",  # The reversible.long zip
-        ]:
-            bydistrict_files: Set[str] = set()  # Ensure each is processed only once
+# TODO - Move these into constants.py
 
-            for xx in states:
-                for chamber in chambers:
-                    for e_id in ensembles:
-
-                        # Toggle between the two types of zips
-
-                        if zip_type == "xx_chamber" and e_id == "Rev":
-                            continue
-                        if zip_type == "reversible.long" and e_id != "Rev":
-                            continue
-
-                        zip_path: str
-                        if zip_type == "xx_chamber":
-                            zip_path = os.path.expanduser(
-                                f"{args.input}/{xx}_{chamber}.zip"
-                            )
-                        else:
-                            zip_path = os.path.expanduser(
-                                f"{args.input}/reversible.long.zip"
-                            )
-
-                        # Read the bydistrict JSONL files from the zips.
-                        # To keep this nested xx / chamber / e__id looping simple,
-                        # it cracks the same {xx}_{chamber} zip file repeatedly.
-
-                        with tempfile.TemporaryDirectory() as temp_dir:
-                            with zipfile.ZipFile(zip_path) as zf:
-
-                                # Get the by-district file names
-
-                                ensemble_name: str = get_ensemble_name(
-                                    xx, chamber, e_id
-                                )
-                                assert (
-                                    ensemble_name not in bydistrict_files
-                                ), f"Duplicate ensemble name {ensemble_name} found in {zip_path}"
-                                bydistrict_files.add(ensemble_name)
-
-                                aggregates_pattern: str = "*_bydistrict.jsonl"
-                                if e_id != "Rev":
-                                    aggregates_pattern = f"{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}.xz"
-                                else:
-                                    aggregates_pattern = f"reversible.long/{xx}/{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}"
-
-                                zipped_files: List[str] = zf.namelist()
-                                zipped_files = [
-                                    f
-                                    for f in zipped_files
-                                    if fnmatch.fnmatch(f, aggregates_pattern)
-                                ]
-                                assert (
-                                    len(zipped_files) == 5
-                                ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
-
-                                # Read each file & collect the aggregates
-
-                                aggregate_pieces: List[Dict[str, Dict[str, Any]]] = (
-                                    list()
-                                )
-                                for j, aggs_file in enumerate(zipped_files):
-                                    agg_type = next(
-                                        (s for s in agg_types if s in aggs_file),
-                                        None,
-                                    )
-                                    assert (
-                                        agg_type is not None
-                                    ), f"Unknown aggregate type in {aggs_file}"
-                                    print(
-                                        f"  Loading {agg_type} aggregates: {aggs_file} ..."
-                                    )
-
-                                    if e_id != "Rev":
-                                        xz_data = zf.read(aggs_file)
-                                        agg_data = lzma.decompress(xz_data)
-                                    else:
-                                        agg_data = zf.read(aggs_file)
-
-                                    json_objects: List[Dict[str, Any]] = decode_bytes(
-                                        agg_data
-                                    )
-
-                                    agg_partial: Dict[str, Dict[str, Any]] = (
-                                        extract_aggregates(json_objects, agg_type)
-                                    )
-                                    aggregate_pieces.append(agg_partial)
-
-                                    i += 1
-
-                                # Merge the aggregates from all files
-
-                                aggs_for_plans: Dict[str, Dict[str, Any]] = (
-                                    merge_aggregates(aggregate_pieces)
-                                )
-
-                                # Write the combined aggregates to the output stream
-
-                                for name, aggs in aggs_for_plans.items():
-                                    record: Dict[str, Any] = {
-                                        "_tag_": "by-district",
-                                        "name": name,
-                                        "state": xx,
-                                        "chamber": chamber,
-                                        "ensemble": e_id,
-                                        "aggregates": aggs,
-                                    }
-                                    write_record(record, aggregates_stream)
-
-    print(f"Collected all {i} bydistrict files ...")  # s.b. 1,680
-
-
-### HELPERS ###
-
-agg_types: List[str] = [
-    "general",
-    "partisan",
-    "minority",
-    "compactness",
-    "splitting",
-]
-datasets_by_type: Dict[str, List[str]] = {
+datasets_by_aggregate_category: Dict[str, List[str]] = {
     "general": ["census"],
     "partisan": ["election"],
     "minority": ["vap", "cvap"],
     "compactness": ["shapes"],
     "splitting": ["census"],
 }
+aggregate_categories: List[str] = list(datasets_by_aggregate_category.keys())
+
+# TODO - Helpers
 
 
 def decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
@@ -205,7 +73,7 @@ def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
         name: str = record["name"]
 
         collection: Dict[str, Any] = dict()
-        for dataset in datasets_by_type[agg_type]:
+        for dataset in datasets_by_aggregate_category[agg_type]:
             # Skip over the dataset type and dataset name
             aggs_list: List[Dict[str, List[Any]]] = record["by-district"][
                 dataset
@@ -236,37 +104,113 @@ def merge_aggregates(
     return merged
 
 
-def parse_arguments():
-    """Parse command line arguments."""
+# DEFINE A FUNCTION
 
-    parser: ArgumentParser = argparse.ArgumentParser(
-        description="Parse command line arguments."
-    )
+assert xx in states, f"Invalid state: {xx}"
+assert chamber in chambers, f"Invalid chamber: {chamber}"
+assert ensemble in ensembles, f"Invalid ensemble: {ensemble}"
+assert category in aggregate_categories, f"Invalid aggregates category: {category}"
+# assert aggregate in aggregates, f"Invalid aggregate: {aggregate}"
 
-    parser.add_argument(
-        "--input",
-        type=str,
-        required=True,
-        help="The directory containing the input .zip files",
-    )
-    parser.add_argument(
-        "--output",
-        type=str,
-        required=True,
-        help="The path to the output .parquet file",
-    )
+for zip_type in [
+    "xx_chamber",  # The 21 xx_chamber zips
+    "reversible.long",  # The reversible.long zip
+]:
+    bydistrict_files: Set[str] = set()  # Ensure each is processed only once
 
-    parser.add_argument("--debug", dest="debug", action="store_true", help="Debug mode")
-    parser.add_argument(
-        "-v", "--verbose", dest="verbose", action="store_true", help="Verbose mode"
-    )
+    for xx in states:
+        for chamber in chambers:
+            for e_id in ensembles:
 
-    args: Namespace = parser.parse_args()
+                # Toggle between the two types of zips
 
-    return args
+                if zip_type == "xx_chamber" and e_id == "Rev":
+                    continue
+                if zip_type == "reversible.long" and e_id != "Rev":
+                    continue
 
+                zip_path: str
+                if zip_type == "xx_chamber":
+                    zip_path = os.path.expanduser(f"{args.input}/{xx}_{chamber}.zip")
+                else:
+                    zip_path = os.path.expanduser(f"{args.input}/reversible.long.zip")
 
-if __name__ == "__main__":
-    main()
+                # Read the bydistrict JSONL files from the zips.
+                # To keep this nested xx / chamber / e__id looping simple,
+                # it cracks the same {xx}_{chamber} zip file repeatedly.
+
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    with zipfile.ZipFile(zip_path) as zf:
+
+                        # Get the by-district file names
+
+                        ensemble_name: str = get_ensemble_name(xx, chamber, e_id)
+                        assert (
+                            ensemble_name not in bydistrict_files
+                        ), f"Duplicate ensemble name {ensemble_name} found in {zip_path}"
+                        bydistrict_files.add(ensemble_name)
+
+                        aggregates_pattern: str = "*_bydistrict.jsonl"
+                        if e_id != "Rev":
+                            aggregates_pattern = f"{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}.xz"
+                        else:
+                            aggregates_pattern = f"reversible.long/{xx}/{xx}_{chamber}/{ensemble_name}/{xx}_{chamber}_{aggregates_pattern}"
+
+                        zipped_files: List[str] = zf.namelist()
+                        zipped_files = [
+                            f
+                            for f in zipped_files
+                            if fnmatch.fnmatch(f, aggregates_pattern)
+                        ]
+                        assert (
+                            len(zipped_files) == 5
+                        ), f"Expected 5 bydistrict files, found {len(zipped_files)}"
+
+                        # Read each file & collect the aggregates
+
+                        aggregate_pieces: List[Dict[str, Dict[str, Any]]] = list()
+                        for j, aggs_file in enumerate(zipped_files):
+                            agg_type = next(
+                                (s for s in aggregate_categories if s in aggs_file),
+                                None,
+                            )
+                            assert (
+                                agg_type is not None
+                            ), f"Unknown aggregate type in {aggs_file}"
+                            print(f"  Loading {agg_type} aggregates: {aggs_file} ...")
+
+                            if e_id != "Rev":
+                                xz_data = zf.read(aggs_file)
+                                agg_data = lzma.decompress(xz_data)
+                            else:
+                                agg_data = zf.read(aggs_file)
+
+                            json_objects: List[Dict[str, Any]] = decode_bytes(agg_data)
+
+                            agg_partial: Dict[str, Dict[str, Any]] = extract_aggregates(
+                                json_objects, agg_type
+                            )
+                            aggregate_pieces.append(agg_partial)
+
+                        # Merge the aggregates from all files
+
+                        aggs_for_plans: Dict[str, Dict[str, Any]] = merge_aggregates(
+                            aggregate_pieces
+                        )
+
+                        # Write the combined aggregates to the output stream
+
+                        for name, aggs in aggs_for_plans.items():
+                            record: Dict[str, Any] = {
+                                "_tag_": "by-district",
+                                "name": name,
+                                "state": xx,
+                                "chamber": chamber,
+                                "ensemble": e_id,
+                                "aggregates": aggs,
+                            }
+                            write_record(record, aggregates_stream)
+
+pass
 
 ### END ###

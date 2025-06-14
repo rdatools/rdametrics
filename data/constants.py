@@ -87,7 +87,9 @@ metrics_by_category: Dict[str, List[str]] = {
 metrics: List[str] = [
     metric for category in metrics_by_category.values() for metric in category
 ]
+metric_categories: List[str] = list(metrics_by_category.keys())
 
+# TODO - Fix this up
 aggregates_by_dataset = {
     "census": ["pop_by_district", "district_splitting"],
     "vap": [
