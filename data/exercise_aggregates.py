@@ -1,49 +1,23 @@
 #!/usr/bin/env python3
 
 """
-TEST HARNESS TO EXERCISE LOADING SCORES & AGGREGATES
+TEST HARNESS TO EXERCISE LOADING & FETCHING AGGREGATES
 """
 
 from typing import Dict, List, Any
 
 import numpy as np
-import pandas as pd
+import fnmatch
 
 from constants import *
-from helpers import load_scores, arr_from_scores, load_aggregates, arr_from_aggregates
+from helpers import load_aggregates, arr_from_aggregates
 
 
 ##########
 
-scores_path: str = "~/local/beta-ensembles/prepackaged/scores/scores.parquet"
 zip_dir: str = "~/local/beta-ensembles/zipped"
 
 ##########
-
-# Verify scores
-
-print()
-print("Loading scores from:", scores_path)
-scores_df: pd.DataFrame = load_scores(scores_path)
-
-print("Exercising scores DataFrame:")
-for xx in states:
-    for chamber in chambers:
-        for ensemble in ensembles:
-            for i, metric in enumerate(metrics):
-                print(
-                    f"  Fetching scores array for {xx}, {chamber}, {ensemble}: {metric} ..."
-                )
-                arr: np.ndarray = arr_from_scores(
-                    xx, chamber, ensemble, metric, scores_df
-                )
-                assert (
-                    arr.size > 0
-                ), f"Empty array for {xx}, {chamber}, {ensemble}, {metric}"
-
-print("All scores loaded successfully.")
-
-# Verify aggregates
 
 print()
 print("Exercising aggregates:")
@@ -68,12 +42,17 @@ for xx in states:
                     )
 
                 for i, loaded_aggregates in enumerate(loaded):
+                    todo: List[str] = list(aggs)
+
                     vap_flavor: str = ""
                     if category == "minority":
-                        vap_flavor = " (VAP)"
-                        if i == 1:
-                            vap_flavor = " (CVAP)"
-                    for agg in aggs:
+                        vap_flavor = " (VAP)" if i == 0 else " (CVAP)"
+                        vap_pattern: str = "*_vap" if i == 0 else "*_cvap"
+                        todo = [
+                            name for name in aggs if fnmatch.fnmatch(name, vap_pattern)
+                        ]
+
+                    for agg in todo:
                         print(
                             f"  Fetching aggregate {agg}{vap_flavor} for {xx}, {chamber}, {ensemble} ..."
                         )

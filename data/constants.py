@@ -4,10 +4,13 @@ CONSTANTS FOR WORKING WITH SCORES AND BY-DISTRICT AGGREGATES
 
 from typing import Dict, List
 
+# The states in the study
 states: List[str] = ["FL", "IL", "MI", "NC", "NY", "OH", "WI"]
 
+# The chambers in the study
 chambers: List[str] = ["congress", "upper", "lower"]
 
+# The identifiers used in the paper for the ensembles in the study
 ensembles: List[str] = [
     "A0",
     "A1",
@@ -29,6 +32,7 @@ ensembles: List[str] = [
 
 ### METRICS ###
 
+# The plan-level metrics computed for each ensemble, by category and individually.
 metrics_by_category: Dict[str, List[str]] = {
     "general": [
         "population_deviation",
@@ -86,13 +90,14 @@ metrics_by_category: Dict[str, List[str]] = {
         "splitting",
     ],
 }
+metric_categories: List[str] = list(metrics_by_category.keys())
 metrics: List[str] = [
     metric for category in metrics_by_category.values() for metric in category
 ]
-metric_categories: List[str] = list(metrics_by_category.keys())
 
 ### AGGREGATES ###
 
+# The by-district aggregates computed for each ensemble, by category and individually.
 aggregates_by_category = {
     "general": ["pop_by_district"],
     "partisan": ["dem_by_district", "tot_by_district"],
@@ -105,11 +110,22 @@ aggregates_by_category = {
         "pacific_vap",
         "total_vap",
         "white_vap",
+        "asian_cvap",
+        "black_cvap",
+        "hispanic_cvap",
+        "minority_cvap",
+        "native_cvap",
+        "pacific_cvap",
+        "total_cvap",
+        "white_cvap",
     ],
     "compactness": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
     "splitting": ["district_splitting"],
 }
 aggregate_categories: List[str] = list(aggregates_by_category.keys())
+aggregates: List[str] = [
+    agg for category in aggregates_by_category.values() for agg in category
+]
 
 datasets_by_aggregate_category: Dict[str, List[str]] = {
     "general": ["census"],
@@ -118,35 +134,5 @@ datasets_by_aggregate_category: Dict[str, List[str]] = {
     "compactness": ["shapes"],
     "splitting": ["census"],
 }
-
-# TODO
-# aggregates_by_dataset = {
-#     "census": ["pop_by_district", "district_splitting"],
-#     "vap": [
-#         "asian_vap",
-#         "black_vap",
-#         "hispanic_vap",
-#         "minority_vap",
-#         "native_vap",
-#         "pacific_vap",
-#         "total_vap",
-#         "white_vap",
-#     ],
-#     "cvap": [
-#         "asian_cvap",
-#         "black_cvap",
-#         "hispanic_cvap",
-#         "minority_cvap",
-#         "native_cvap",
-#         "pacific_cvap",
-#         "total_cvap",
-#         "white_cvap",
-#     ],
-#     "election": ["dem_by_district", "tot_by_district"],
-#     "shapes": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
-# }
-aggregates: List[str] = [
-    agg for category in aggregates_by_category.values() for agg in category
-]
 
 ### END ###
