@@ -93,18 +93,10 @@ metric_categories: List[str] = list(metrics_by_category.keys())
 
 ### AGGREGATES ###
 
-datasets_by_aggregate_category: Dict[str, List[str]] = {
-    "general": ["census"],
-    "partisan": ["election"],
-    "minority": ["vap", "cvap"],
-    "compactness": ["shapes"],
-    "splitting": ["census"],
-}
-aggregate_categories: List[str] = list(datasets_by_aggregate_category.keys())
-
-aggregates_by_dataset = {
-    "census": ["pop_by_district", "district_splitting"],
-    "vap": [
+aggregates_by_category = {
+    "general": ["pop_by_district"],
+    "partisan": ["dem_by_district", "tot_by_district"],
+    "minority": [
         "asian_vap",
         "black_vap",
         "hispanic_vap",
@@ -114,21 +106,47 @@ aggregates_by_dataset = {
         "total_vap",
         "white_vap",
     ],
-    "cvap": [
-        "asian_cvap",
-        "black_cvap",
-        "hispanic_cvap",
-        "minority_cvap",
-        "native_cvap",
-        "pacific_cvap",
-        "total_cvap",
-        "white_cvap",
-    ],
-    "election": ["dem_by_district", "tot_by_district"],
-    "shapes": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
+    "compactness": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
+    "splitting": ["district_splitting"],
 }
+aggregate_categories: List[str] = list(aggregates_by_category.keys())
+
+datasets_by_aggregate_category: Dict[str, List[str]] = {
+    "general": ["census"],
+    "partisan": ["election"],
+    "minority": ["vap", "cvap"],
+    "compactness": ["shapes"],
+    "splitting": ["census"],
+}
+
+# TODO
+# aggregates_by_dataset = {
+#     "census": ["pop_by_district", "district_splitting"],
+#     "vap": [
+#         "asian_vap",
+#         "black_vap",
+#         "hispanic_vap",
+#         "minority_vap",
+#         "native_vap",
+#         "pacific_vap",
+#         "total_vap",
+#         "white_vap",
+#     ],
+#     "cvap": [
+#         "asian_cvap",
+#         "black_cvap",
+#         "hispanic_cvap",
+#         "minority_cvap",
+#         "native_cvap",
+#         "pacific_cvap",
+#         "total_cvap",
+#         "white_cvap",
+#     ],
+#     "election": ["dem_by_district", "tot_by_district"],
+#     "shapes": ["area", "diameter", "perimeter", "polsby_popper", "reock"],
+# }
 aggregates: List[str] = [
-    agg for category in aggregates_by_dataset.values() for agg in category
+    agg for category in aggregates_by_category.values() for agg in category
 ]
 
 ### END ###
