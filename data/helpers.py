@@ -168,7 +168,7 @@ def _decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
 
 
 def _extract_aggregates(
-    data, category: str, minority_dataset: str = "VAP"
+    data, category: str, minority_dataset: str = "vap"
 ) -> List[Dict[str, Any]]:
     """Extract the by-district aggregates from the raw data. Ignore datasets & dataset types. Assume one dataset per type."""
 
