@@ -53,12 +53,14 @@ def decode_bytes(bytes: bytes) -> List[Dict[str, Any]]:
     return json_objects
 
 
-def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
+def extract_aggregates(
+    data, category: str, minority_dataset: str = "VAP"
+) -> List[Dict[str, Any]]:
     """Extract the by-district aggregates from the raw data. Ignore datasets & dataset types. Assume one dataset per type."""
 
-    aggregates_by_name: Dict[str, Dict[str, Any]] = dict()
+    aggregates: List[Dict[str, Any]] = list()
 
-    for i, record in enumerate(data):
+    for record in data:
         assert "_tag_" in record, "Record does not contain '_tag_' key"
 
         if record["_tag_"] == "metadata":
@@ -68,38 +70,26 @@ def extract_aggregates(data, agg_type: str) -> Dict[str, Dict[str, Any]]:
             record["_tag_"] == "by-district"
         ), f"Record does not contain '_tag_' key with value 'by-district': {record}"
 
-        name: str = record["name"]
+        collected_aggregates: Dict[str, Any] = dict()
+        collected_aggregates["name"] = record["name"]
 
-        collection: Dict[str, Any] = dict()
-        for dataset in datasets_by_aggregate_category[agg_type]:
-            # Skip over the dataset type and dataset name
-            aggs_list: List[Dict[str, List[Any]]] = record["by-district"][
-                dataset
-            ].values()
-            # Make the aggregates a single dictionary again
-            aggs_dict: Dict[str, List[Any]] = {
-                k: v for agg in aggs_list for k, v in agg.items()
-            }
-            collection.update(aggs_dict)
+        dataset: str = (
+            datasets_by_aggregate_category[category][0]
+            if category != "minority"
+            else minority_dataset  # VAP or CVAP
+        )
 
-        aggregates_by_name[name] = collection
+        # Skip over the dataset type and dataset name
+        aggs_list: List[Dict[str, List[Any]]] = record["by-district"][dataset].values()
+        # Make the aggregates a single dictionary again
+        aggs_dict: Dict[str, List[Any]] = {
+            k: v for agg in aggs_list for k, v in agg.items()
+        }
+        collected_aggregates.update(aggs_dict)
 
-    return aggregates_by_name
+        aggregates.append(collected_aggregates)
 
-
-def merge_aggregates(
-    separate_aggs: List[Dict[str, Dict[str, Any]]],
-) -> Dict[str, Dict[str, Any]]:
-    """Merge the separate aggregates together."""
-
-    all_names = set().union(*separate_aggs)
-    merged = {name: {} for name in sorted(all_names)}
-
-    for d in separate_aggs:
-        for name, info in d.items():
-            merged[name].update(info)
-
-    return merged
+    return aggregates
 
 
 # DEFINE A FUNCTION
@@ -146,8 +136,8 @@ with tempfile.TemporaryDirectory() as temp_dir:
 
         json_objects: List[Dict[str, Any]] = decode_bytes(agg_data)
 
-        agg_partial: Dict[str, Dict[str, Any]] = extract_aggregates(
-            json_objects, agg_type
+        aggregate_data: List[Dict[str, Any]] = extract_aggregates(
+            json_objects, category
         )
 
         # TODO - Collect the records
