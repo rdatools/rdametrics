@@ -1,5 +1,5 @@
 """
-CONSTANTS
+CONSTANTS FOR WORKING WITH SCORES AND BY-DISTRICT AGGREGATES
 """
 
 from typing import Dict, List
@@ -26,6 +26,8 @@ ensembles: List[str] = [
     "R75",
     "R100",
 ]
+
+### METRICS ###
 
 metrics_by_category: Dict[str, List[str]] = {
     "general": [
@@ -89,7 +91,17 @@ metrics: List[str] = [
 ]
 metric_categories: List[str] = list(metrics_by_category.keys())
 
-# TODO - Fix this up
+### AGGREGATES ###
+
+datasets_by_aggregate_category: Dict[str, List[str]] = {
+    "general": ["census"],
+    "partisan": ["election"],
+    "minority": ["vap", "cvap"],
+    "compactness": ["shapes"],
+    "splitting": ["census"],
+}
+aggregate_categories: List[str] = list(datasets_by_aggregate_category.keys())
+
 aggregates_by_dataset = {
     "census": ["pop_by_district", "district_splitting"],
     "vap": [
