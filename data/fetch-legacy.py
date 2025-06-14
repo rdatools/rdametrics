@@ -1,10 +1,94 @@
 """
-fetch_score_array() from Kris' analysis code
+fetch_score_array() & supporting code from Kris' analysis code
 """
 
-import json
 import pandas as pd
 import numpy as np
+import json
+
+# Code to fetch the score array for a given state, chamber, ensemble_type and score.
+# and also creates the lists of ensemble types, score, and state-chamber combinations.
+
+local_folder = "C:/Users/ktapp/Documents/Python/vanilla ensembles"
+
+state_list = ["FL", "IL", "MI", "NC", "NY", "OH", "WI"]
+
+num_seats_dict = {
+    ("FL", "congress"): 28,
+    ("FL", "upper"): 40,
+    ("FL", "lower"): 120,
+    ("IL", "congress"): 17,
+    ("IL", "upper"): 59,
+    ("IL", "lower"): 118,
+    ("MI", "congress"): 13,
+    ("MI", "upper"): 38,
+    ("MI", "lower"): 110,
+    ("NC", "congress"): 14,
+    ("NC", "upper"): 50,
+    ("NC", "lower"): 120,
+    ("NY", "congress"): 26,
+    ("NY", "upper"): 63,
+    ("NY", "lower"): 150,
+    ("OH", "congress"): 15,
+    ("OH", "upper"): 33,
+    ("OH", "lower"): 99,
+    ("WI", "congress"): 8,
+    ("WI", "upper"): 33,
+    ("WI", "lower"): 99,
+}
+
+# Tally the Dem voteshare for each state
+state_to_dem_voteshare = dict()
+for state in state_list:
+    chamber = "congress"
+    pop0 = "0.01"
+    county0 = "0.0"
+    type0 = "cut-edges-rmst"
+    snipet = f"T{pop0}_S{county0}_R0_V{type0}"
+    filename = f"{local_folder}/{state}_{chamber}/{state}_{chamber}/{state}_{chamber}_{snipet}/{state}_{chamber}_{snipet}_partisan_scores.csv"
+    df = pd.read_csv(filename)
+    a = df["estimated_vote_pct"][0]
+    state_to_dem_voteshare[state] = a
+
+with open(
+    "score_categories.json", "r"
+) as file:  # Read in Alec's dictionary of caterorized scores.
+    score_categories = json.load(file)
+
+# create dictionary mapping my version of each primary score name to the corresponding name in Alec's dictionary
+primary_score_dict = {
+    "Reock": "reock",
+    "Polsby-Popper": "polsby_popper",
+    "cut edges": "cut_score",
+    "Dem seats": "fptp_seats",
+    "efficiency gap": "efficiency_gap_wasted_votes",
+    "mean-median": "mean_median_average_district",
+    "seat bias": "geometric_seats_bias",
+    "competitive districts": "competitive_district_count",
+    "average margin": "average_margin",
+    "MMD black": "mmd_black",
+    "MMD hispanic": "mmd_hispanic",
+    "county splits": "county_splits",
+    "counties split": "counties_split",
+}
+
+# List of primary scores and list of secondary scores
+primary_score_list = list(primary_score_dict.keys()) + ["MMD coalition"]
+secondary_score_list = [
+    score
+    for ls in score_categories.values()
+    for score in ls
+    if score not in primary_score_dict.values()
+]
+
+# dictionary mapping each score from primary_score_list and secondary_score_list to info about the spreadsheet column where it is stored
+score_to_spreadsheet_info = {}
+for category, scores in score_categories.items():
+    for score in scores:
+        score_to_spreadsheet_info[score] = (f"{category}_scores.csv", score)
+
+for my_score_name, score in primary_score_dict.items():
+    score_to_spreadsheet_info[my_score_name] = score_to_spreadsheet_info[score]
 
 
 def fetch_score_array(state, chamber, ensemble_type, score):
