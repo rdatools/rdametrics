@@ -37,7 +37,7 @@ with open(config_path, "r") as file:
 scores_path = config["scores-path"]
 zip_dir = config["zip-dir"]
 
-##################################
+########## MODIFIED CODE ##########
 
 state_list = states
 num_seats_dict = extract_num_seats(DISTRICTS_BY_STATE)
@@ -49,14 +49,14 @@ for state in state_list:
     a = arr_from_scores(state, "congress", "A0", "estimated_vote_pct", scores_df)[0]
     state_to_dem_voteshare[state] = a
 
+########## UNMODIFIED CODE ##########
+
 # Read in Alec's dictionary of caterorized scores.
 # NOTE - Might not need the next two lines if the score_categories.json is already in the same directory as this script.
 script_dir = os.path.dirname(os.path.abspath(__file__))
 categories_path = os.path.join(script_dir, "score_categories.json")
 with open(categories_path, "r") as file:
     score_categories = json.load(file)
-
-pass  # TODO
 
 # create dictionary mapping my version of each primary score name to the corresponding name in Alec's dictionary
 primary_score_dict = {
@@ -92,6 +92,8 @@ for category, scores in score_categories.items():
 
 for my_score_name, score in primary_score_dict.items():
     score_to_spreadsheet_info[my_score_name] = score_to_spreadsheet_info[score]
+
+pass  # TODO - Here ...
 
 
 def fetch_score_array(state, chamber, ensemble_type, score):
