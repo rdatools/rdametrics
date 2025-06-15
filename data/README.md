@@ -111,7 +111,7 @@ chamber = "congress"
 ensemble = "A0"
 category = "partisan"
 zip_dir = "/path/to/dir-with-zip-files"
-aggregates_subset = load_aggregates(xx, chamber, ensemble, category)
+aggregates_subset = load_aggregates(xx, chamber, ensemble, category, zip_dir)
 ```
 
 You need to do this for each different combination of those parameters, where
@@ -123,7 +123,7 @@ If you want the 'cvap' aggregates instead, modify the call:
 
 ```python
 category = "minority"
-aggregates_subset = load_aggregates(xx, chamber, ensemble, category, minority_dataset="cvap")
+aggregates_subset = load_aggregates(xx, chamber, ensemble, category, zip_dir, minority_dataset="cvap")
 ```
 
 You can, of course, work with this directly in Python. It is a list of dictionaries,
