@@ -1,0 +1,4 @@
+{
+    "scores-path": "~/local/beta-ensembles/prepackaged/scores/scores.parquet",
+    "zip-dir": "~/local/beta-ensembles/zipped"
+}

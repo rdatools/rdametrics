@@ -18,9 +18,9 @@ logs/
 
 # For debugging the 'thunking' layer for Kris
 
-config.json
-fetch.py
-score_categories.json
+# config.json
+# fetch.py
+# score_categories.json
 
 # End of customizations
 
