@@ -7,8 +7,7 @@ TEST HARNESS TO EXERCISE LOADING & FETCHING SCORES
 import numpy as np
 import pandas as pd
 
-from constants import *
-from helpers import load_scores, arr_from_scores
+from data import states, chambers, ensembles, metrics, load_scores, arr_from_scores
 
 
 ##########

@@ -16,7 +16,7 @@ To use this script:
 
 (3) Zip the README.md together with the .jsonl file and upload it to the download server.
 
-NOTE - This isn't a good solution: The file size is way too big (~40GB) making the access time very slow.
+NOTE - This is NOT a good solution: The file size is way too big (~40GB) making the access time very slow.
 """
 
 from typing import Dict, List, Set, Any

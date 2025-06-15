@@ -1,84 +1,5 @@
 """
 HELPERS FOR WORKING WITH SCORES AND BY-DISTRICT AGGREGATES
-
-These functions make it easier to work with the all-up scores 'pandas' dataframe
-(scores.parquet) and all the by-district aggregates contained in the state/chamber
-zip files. To use them, import this file into your Python. Put the
-companion file, constants.py, along side it.
-
-To work with the scores dataframe, load 'panda' dataframe from disk:
-
-    scores_df = load_scores("/path/to/scores.parquet")
-
-You only need to do this once per session, i.e., it loads *all* the
-plan-level scores (metrics) into a single 'pandas' dataframe.
-
-You can use this as with vanilla dataframe operations. Alternatively,
-you can filter the dataframe to the subset for a state, chamber, and
-ensemble:
-
-    xx = "NC"
-    chamber = "congress"
-    ensemble = "A0"
-    subset_df = df_from_scores(xx, chamber, ensemble, scores_df)
-
-You can also fetch an individual metric for for a state, chamber, and
-ensemble:
-
-    metric = "estimated_seats"
-    arr = arr_from_scores(xx, chamber, ensemble, metric, scores_df)
-
-This returns a 1D 'numpy' array.
-
-The companion file constants.py defines many helpful constants, e.g.,
-if you want to iterate over states, chambers, ensembles, metrics, and
-aggregates, etc.
-
-To work with by-district aggregates, first load the desired aggregates
-from disk:
-
-    xx = "NC"
-    chamber = "congress"
-    ensemble = "A0"
-    category = "partisan"
-    zip_dir = "/path/to/dir-with-zip-files"
-    aggregates_subset = load_aggregates(xx, chamber, ensemble, category)
-
-You need to do this for each different combination of those parameters, where
-the aggregate categories (defined in constants.py) are 'general', 'partisan',
-'minority', 'compactness', and 'splitting'.
-
-By default, this will load the 'vap' aggregates for the 'minority' category.
-If you want the 'cvap' aggregates instead, modify the call:
-
-    category = "minority"
-    aggregates_subset = load_aggregates(xx, chamber, ensemble, category, minority_dataset="cvap")
-
-You can, of course, work with this directly in Python. It is a list of dictionaries,
-where each item in the list corresponds to a plan, and each dictionary contains the
-by-district aggregates for that plan. The keys are the names of the aggregates, and
-the values are lists of values for the districts in the plan.
-
-Note: The first value in each list is a statewide aggregate. The other 1-N values
-correspond to the districts in the plan.
-
-Alternatively, you can extract an individual aggregate from the loaded subset:
-
-    aggregate = "dem_by_district"
-    arr = arr_from_aggregates(aggregate, aggregates_subset)
-
-This returns a 2D 'numpy' array where each row corresponds to a plan, and the "column"
-contains the list of values for the districts in the plan. By default, this excludes
-the statewide aggregate. If you want those included, you can set the `include_statewide`
-parameter to `True`:
-
-You can also fetch multiple aggregates from the same category in succession:
-
-    arrays = {}
-    for aggregate in ["dem_by_district", "tot_by_district"]:
-        arr = arr_from_aggregates(aggregate, aggregates_subset)
-        arrays[aggregate] = arr
-
 """
 
 from typing import List, Dict, Any
@@ -92,7 +13,7 @@ import lzma
 import tempfile
 
 from rdapy import smart_read
-from constants import (
+from .constants import (
     states,
     chambers,
     ensembles,
@@ -101,7 +22,7 @@ from constants import (
     aggregate_categories,
     datasets_by_aggregate_category,
 )
-from filenames import get_ensemble_name
+from .filenames import get_ensemble_name
 
 ### SCORES ###
 
