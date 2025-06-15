@@ -18,8 +18,8 @@ logs/
 
 #
 
-data/config.json
-data/fetch.py
+config.json
+fetch.py
 
 # End of customizations
 
