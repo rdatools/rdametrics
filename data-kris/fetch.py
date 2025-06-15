@@ -59,7 +59,9 @@ def _calc_d_vote_share(xx: str, chamber: str, ensemble: str) -> np.ndarray:
     to_return = []
     # No metadata record
     for i, (dem_counts, tot_counts) in enumerate(zip(arrays[0], arrays[1])):
-        dem_portions = [dem_counts[i] / tot_counts[i] for i in range(dem_counts)]
+        dem_portions = [
+            dem_counts[i] / tot_counts[i] for i in range(dem_counts.shape[0])
+        ]
         dem_portions.sort()
         to_return.append(np.array(dem_portions))
 
@@ -179,9 +181,25 @@ xx = "NC"
 chamber = "congress"
 ensemble = "base0"
 
-score = "Reock"
-result = fetch_score_array(state, chamber, ensemble, score)
+for score in [
+    "Reock",
+    "Polsby-Popper",
+    "cut edges",
+    "Dem seats",
+    "efficiency gap",
+    "mean-median",
+    "seat bias",
+    "competitive districts",
+    "average margin",
+    "MMD black",
+    "MMD hispanic",
+    "county splits",
+    "counties split",
+]:
+    print(f"Fetching score: {score}")
+    result = fetch_score_array(state, chamber, ensemble, score)
 
+print("Fetching D vote share (by_district)")
 score = "by_district"
 result = fetch_score_array(state, chamber, ensemble, score)
 
