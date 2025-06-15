@@ -12,16 +12,16 @@ chambers: List[str] = ["congress", "upper", "lower"]
 
 # The identifiers used in the paper for the ensembles in the study
 ensembles: List[str] = [
-    "A0",
+    "A0",  # Cut edges, minimum spanning tree
     "A1",
     "A2",
     "A3",
     "A4",
     "Pop-",
     "Pop+",
-    "B",
-    "C",
-    "D",
+    "B",  # District pairs, minimum spanning tree
+    "C",  # Cut edges, uniform spanning tree
+    "D",  # District pairs, uniform spanning tree
     "Rev*",  # The original 50M sampled every 2.5K ensembles
     "Rev",  # The revised 1B sampled every 50K ensembles
     "R25",

@@ -33,7 +33,7 @@ scores_path = config["scores-path"]
 zip_dir = config["zip-dir"]
 
 
-def extract_num_seats(districts_by_state):
+def _extract_num_seats(districts_by_state):
     """Extract num_seats_dict from DISTRICTS_BY_STATE."""
 
     num_seats_dict = {}
@@ -46,7 +46,7 @@ def extract_num_seats(districts_by_state):
     return num_seats_dict
 
 
-def calc_d_vote_share(xx: str, chamber: str, ensemble: str) -> np.ndarray:
+def _calc_d_vote_share(xx: str, chamber: str, ensemble: str) -> np.ndarray:
     """Calculate the two-party Democratic vote share"""
 
     aggregates_subset = load_aggregates(xx, chamber, ensemble, "partisan", zip_dir)
@@ -66,10 +66,66 @@ def calc_d_vote_share(xx: str, chamber: str, ensemble: str) -> np.ndarray:
     return np.array(to_return)
 
 
+def _map_score_name(user_name: str) -> str:
+    """Map Kris' score names to the names in the scores dataframe."""
+
+    if user_name == "by_district":
+        return "by_district"
+
+    mapping: Dict[str, str] = {
+        "Reock": "reock",
+        "Polsby-Popper": "polsby_popper",
+        "cut edges": "cut_score",
+        "Dem seats": "fptp_seats",
+        "efficiency gap": "efficiency_gap_wasted_votes",
+        "mean-median": "mean_median_average_district",
+        "seat bias": "geometric_seats_bias",
+        "competitive districts": "competitive_district_count",
+        "average margin": "average_margin",
+        "MMD black": "mmd_black",
+        "MMD hispanic": "mmd_hispanic",
+        "county splits": "county_splits",
+        "counties split": "counties_split",
+        # Extend this mapping, to support more scores
+    }
+    if user_name in mapping:
+        return mapping[user_name]
+    else:
+        raise ValueError(f"Unknown user score: {user_name}. Please check the mapping.")
+
+
+def _map_ensemble_name(user_name: str) -> str:
+    """Map Kris' ensemble names to the names in the helpers."""
+
+    mapping: Dict[str, str] = {
+        "base0": "A0",
+        "base1": "A1",
+        "base2": "A2",
+        "base3": "A3",
+        "base4": "A4",
+        "pop_minus": "Pop-",
+        "pop_plus": "Pop+",
+        "ust": "C",
+        "distpair": "B",
+        "distpair_ust": "D",
+        "reversible": "Rev",
+        "county25": "R25",
+        "county50": "R50",
+        "county75": "R75",
+        "county100": "R100",
+    }
+    if user_name in mapping:
+        return mapping[user_name]
+    else:
+        raise ValueError(
+            f"Unknown user ensemble: {user_name}. Please check the mapping."
+        )
+
+
 ########## MODIFIED CODE ##########
 
 state_list = states
-num_seats_dict = extract_num_seats(DISTRICTS_BY_STATE)
+num_seats_dict = _extract_num_seats(DISTRICTS_BY_STATE)
 
 # Tally the Dem voteshare for each state
 scores_df: pd.DataFrame = load_scores(scores_path)
@@ -78,49 +134,7 @@ for state in state_list:
     a = arr_from_scores(state, "congress", "A0", "estimated_vote_pct", scores_df)[0]
     state_to_dem_voteshare[state] = a
 
-
-########## DEAD CODE ##########
-
-# local_folder = "C:/Users/ktapp/Documents/Python/vanilla ensembles"
-
-# # Read in Alec's dictionary of caterorized scores.
-# with open("score_categories.json", "r") as file:
-#     score_categories = json.load(file)
-
-# # create dictionary mapping my version of each primary score name to the corresponding name in Alec's dictionary
-# primary_score_dict = {
-#     "Reock": "reock",
-#     "Polsby-Popper": "polsby_popper",
-#     "cut edges": "cut_score",
-#     "Dem seats": "fptp_seats",
-#     "efficiency gap": "efficiency_gap_wasted_votes",
-#     "mean-median": "mean_median_average_district",
-#     "seat bias": "geometric_seats_bias",
-#     "competitive districts": "competitive_district_count",
-#     "average margin": "average_margin",
-#     "MMD black": "mmd_black",
-#     "MMD hispanic": "mmd_hispanic",
-#     "county splits": "county_splits",
-#     "counties split": "counties_split",
-# }
-
-# # List of primary scores and list of secondary scores
-# primary_score_list = list(primary_score_dict.keys()) + ["MMD coalition"]
-# secondary_score_list = [
-#     score
-#     for ls in score_categories.values()
-#     for score in ls
-#     if score not in primary_score_dict.values()
-# ]
-
-# # dictionary mapping each score from primary_score_list and secondary_score_list to info about the spreadsheet column where it is stored
-# score_to_spreadsheet_info = {}
-# for category, scores in score_categories.items():
-#     for score in scores:
-#         score_to_spreadsheet_info[score] = (f"{category}_scores.csv", score)
-
-# for my_score_name, score in primary_score_dict.items():
-#     score_to_spreadsheet_info[my_score_name] = score_to_spreadsheet_info[score].
+##########
 
 
 def fetch_score_array(state, chamber, ensemble_type, score):
@@ -148,65 +162,29 @@ def fetch_score_array(state, chamber, ensemble_type, score):
             + fetch_score_array(state, chamber, ensemble_type, "mmd_coalition")
         )
 
-    # if chamber == "congress":
-    #     pop0 = "0.01"
-    #     pop_minus = "0.005"
-    #     pop_plus = "0.015"
-    # else:
-    #     pop0 = "0.05"
-    #     pop_minus = "0.025"
-    #     pop_plus = "0.075"
+    # Either a simple plan-level score or the D vote share
 
-    # type0 = "cut-edges-rmst"
-    # type1 = "cut-edges-region-aware"
-    # county0 = "0.0"
-
-    # ensemble_dict = {
-    #     "base0": f"T{pop0}_S{county0}_R0_V{type0}",
-    #     "base1": f"T{pop0}_S{county0}_R1_V{type0}",
-    #     "base2": f"T{pop0}_S{county0}_R2_V{type0}",
-    #     "base3": f"T{pop0}_S{county0}_R3_V{type0}",
-    #     "base4": f"T{pop0}_S{county0}_R4_V{type0}",
-    #     "pop_minus": f"T{pop_minus}_S{county0}_R0_V{type0}",
-    #     "pop_plus": f"T{pop_plus}_S{county0}_R0_V{type0}",
-    #     "ust": f"T{pop0}_S{county0}_R0_Vcut-edges-ust",
-    #     "distpair": f"T{pop0}_S{county0}_R0_Vdistrict-pairs-rmst",
-    #     "distpair_ust": f"T{pop0}_S{county0}_R0_Vdistrict-pairs-ust",
-    #     "reversible": f"T{pop0}_S{county0}_R0_Vreversible",
-    #     "county25": f"T{pop0}_S{0.25}_R0_V{type1}",
-    #     "county50": f"T{pop0}_S{0.5}_R0_V{type1}",
-    #     "county75": f"T{pop0}_S{0.75}_R0_V{type1}",
-    #     "county100": f"T{pop0}_S{1.0}_R0_V{type1}",
-    # }
-    # snipet = ensemble_dict[ensemble_type]
-
-    # score_sheet, col_name = (
-    #     score_to_spreadsheet_info[score]
-    #     if score != "by_district"
-    #     else ("partisan_bydistrict.jsonl", None)
-    # )
-
-    # filename = f"{local_folder}/{state}_{chamber}/{state}_{chamber}/{state}_{chamber}_{snipet}/{state}_{chamber}_{snipet}_{score_sheet}"
-
-    # TODO - Map ensemble id's
-    # TODO - Map metric names
+    ensemble = _map_ensemble_name(ensemble_type)
+    col_name: str = _map_score_name(score)
 
     if score == "by_district":
-        return calc_d_vote_share(xx, chamber, ensemble)
+        return _calc_d_vote_share(xx, chamber, ensemble)
     else:  # a non-by-district score
-        df = pd.read_csv(filename)
-        return df[col_name].to_numpy()
+        return arr_from_scores(state, chamber, ensemble, col_name, scores_df)
 
-
-# def _fetch_score_array(state, chamber, ensemble, score):
 
 ########## TEST CODE ##########
 
 xx = "NC"
 chamber = "congress"
-ensemble = "A0"
-metric = "reock"
+ensemble = "base0"
 
-result = fetch_score_array(state, chamber, ensemble, metric)
+score = "Reock"
+result = fetch_score_array(state, chamber, ensemble, score)
+
+score = "by_district"
+result = fetch_score_array(state, chamber, ensemble, score)
+
+pass  # for debugging
 
 ### END ###
