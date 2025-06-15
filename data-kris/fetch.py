@@ -37,6 +37,7 @@ with open(config_path, "r") as file:
 scores_path = config["scores-path"]
 zip_dir = config["zip-dir"]
 
+
 ########## MODIFIED CODE ##########
 
 state_list = states
@@ -49,49 +50,49 @@ for state in state_list:
     a = arr_from_scores(state, "congress", "A0", "estimated_vote_pct", scores_df)[0]
     state_to_dem_voteshare[state] = a
 
-########## UNMODIFIED CODE ##########
 
-# Read in Alec's dictionary of caterorized scores.
-# NOTE - Might not need the next two lines if the score_categories.json is already in the same directory as this script.
-script_dir = os.path.dirname(os.path.abspath(__file__))
-categories_path = os.path.join(script_dir, "score_categories.json")
-with open(categories_path, "r") as file:
-    score_categories = json.load(file)
+########## DEAD CODE ##########
 
-# create dictionary mapping my version of each primary score name to the corresponding name in Alec's dictionary
-primary_score_dict = {
-    "Reock": "reock",
-    "Polsby-Popper": "polsby_popper",
-    "cut edges": "cut_score",
-    "Dem seats": "fptp_seats",
-    "efficiency gap": "efficiency_gap_wasted_votes",
-    "mean-median": "mean_median_average_district",
-    "seat bias": "geometric_seats_bias",
-    "competitive districts": "competitive_district_count",
-    "average margin": "average_margin",
-    "MMD black": "mmd_black",
-    "MMD hispanic": "mmd_hispanic",
-    "county splits": "county_splits",
-    "counties split": "counties_split",
-}
+# local_folder = "C:/Users/ktapp/Documents/Python/vanilla ensembles"
 
-# List of primary scores and list of secondary scores
-primary_score_list = list(primary_score_dict.keys()) + ["MMD coalition"]
-secondary_score_list = [
-    score
-    for ls in score_categories.values()
-    for score in ls
-    if score not in primary_score_dict.values()
-]
+# # Read in Alec's dictionary of caterorized scores.
+# with open("score_categories.json", "r") as file:
+#     score_categories = json.load(file)
 
-# dictionary mapping each score from primary_score_list and secondary_score_list to info about the spreadsheet column where it is stored
-score_to_spreadsheet_info = {}
-for category, scores in score_categories.items():
-    for score in scores:
-        score_to_spreadsheet_info[score] = (f"{category}_scores.csv", score)
+# # create dictionary mapping my version of each primary score name to the corresponding name in Alec's dictionary
+# primary_score_dict = {
+#     "Reock": "reock",
+#     "Polsby-Popper": "polsby_popper",
+#     "cut edges": "cut_score",
+#     "Dem seats": "fptp_seats",
+#     "efficiency gap": "efficiency_gap_wasted_votes",
+#     "mean-median": "mean_median_average_district",
+#     "seat bias": "geometric_seats_bias",
+#     "competitive districts": "competitive_district_count",
+#     "average margin": "average_margin",
+#     "MMD black": "mmd_black",
+#     "MMD hispanic": "mmd_hispanic",
+#     "county splits": "county_splits",
+#     "counties split": "counties_split",
+# }
 
-for my_score_name, score in primary_score_dict.items():
-    score_to_spreadsheet_info[my_score_name] = score_to_spreadsheet_info[score]
+# # List of primary scores and list of secondary scores
+# primary_score_list = list(primary_score_dict.keys()) + ["MMD coalition"]
+# secondary_score_list = [
+#     score
+#     for ls in score_categories.values()
+#     for score in ls
+#     if score not in primary_score_dict.values()
+# ]
+
+# # dictionary mapping each score from primary_score_list and secondary_score_list to info about the spreadsheet column where it is stored
+# score_to_spreadsheet_info = {}
+# for category, scores in score_categories.items():
+#     for score in scores:
+#         score_to_spreadsheet_info[score] = (f"{category}_scores.csv", score)
+
+# for my_score_name, score in primary_score_dict.items():
+#     score_to_spreadsheet_info[my_score_name] = score_to_spreadsheet_info[score]
 
 pass  # TODO - Here ...
 
@@ -104,8 +105,6 @@ def fetch_score_array(state, chamber, ensemble_type, score):
     If score == 'by_district', then it returns a 2D array containing,
     for each map in the ensemble, an ordered array recording the dem_portions of the districts of the map.
     """
-
-    local_folder = "C:/Users/ktapp/Documents/Python/vanilla ensembles"
 
     if (
         score[:3] == "maj"
