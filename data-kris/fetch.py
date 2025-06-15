@@ -148,16 +148,16 @@ def fetch_score_array(state, chamber, ensemble_type, score):
     for each map in the ensemble, an ordered array recording the dem_portions of the districts of the map.
     """
 
-    if (
-        score[:3] == "maj"
-    ):  # preface a partisan score with 'maj ' to make it with respect to the majority party
+    # preface a partisan score with 'maj ' to make it with respect to the majority party
+    if score[:3] == "maj":
         a = fetch_score_array(state, chamber, ensemble_type, score[4:])
         if state_to_dem_voteshare[state] > 0.5:
             return a
         else:
             return num_seats_dict[(state, chamber)] - a
 
-    if score == "MMD coalition":  # the total should include all three MMD scores
+    # the total should include all three MMD scores
+    if score == "MMD coalition":
         return (
             fetch_score_array(state, chamber, ensemble_type, "mmd_black")
             + fetch_score_array(state, chamber, ensemble_type, "mmd_hispanic")
@@ -170,39 +170,39 @@ def fetch_score_array(state, chamber, ensemble_type, score):
     col_name: str = _map_score_name(score)
 
     if score == "by_district":
-        return _calc_d_vote_share(xx, chamber, ensemble)
+        return _calc_d_vote_share(state, chamber, ensemble)
     else:  # a non-by-district score
         return arr_from_scores(state, chamber, ensemble, col_name, scores_df)
 
 
 ########## TEST CODE ##########
 
-xx = "NC"
-chamber = "congress"
-ensemble = "base0"
+# xx = "NC"
+# chamber = "congress"
+# ensemble = "base0"
 
-for score in [
-    "Reock",
-    "Polsby-Popper",
-    "cut edges",
-    "Dem seats",
-    "efficiency gap",
-    "mean-median",
-    "seat bias",
-    "competitive districts",
-    "average margin",
-    "MMD black",
-    "MMD hispanic",
-    "county splits",
-    "counties split",
-]:
-    print(f"Fetching score: {score}")
-    result = fetch_score_array(state, chamber, ensemble, score)
+# for score in [
+#     "Reock",
+#     "Polsby-Popper",
+#     "cut edges",
+#     "Dem seats",
+#     "efficiency gap",
+#     "mean-median",
+#     "seat bias",
+#     "competitive districts",
+#     "average margin",
+#     "MMD black",
+#     "MMD hispanic",
+#     "county splits",
+#     "counties split",
+# ]:
+#     print(f"Fetching score: {score}")
+#     result = fetch_score_array(state, chamber, ensemble, score)
 
-print("Fetching D vote share (by_district)")
-score = "by_district"
-result = fetch_score_array(state, chamber, ensemble, score)
+# print("Fetching D vote share (by_district)")
+# score = "by_district"
+# result = fetch_score_array(state, chamber, ensemble, score)
 
-pass  # for debugging
+# pass  # for debugging
 
 ### END ###
