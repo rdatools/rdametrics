@@ -16,6 +16,11 @@ logs/
 ~$*.xlsx
 ~$*.docx
 
+#
+
+data/config.json
+data/fetch.py
+
 # End of customizations
 
 # Byte-compiled / optimized / DLL files
