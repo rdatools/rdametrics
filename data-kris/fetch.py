@@ -142,6 +142,23 @@ for state in state_list:
     a = arr_from_scores(state, "congress", "A0", "estimated_vote_pct", scores_df)[0]
     state_to_dem_voteshare[state] = a
 
+
+# NOTE - Might not need the next two lines if the score_categories.json is already in the same directory as this script.
+script_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(script_dir, "score_categories.json")
+with open(config_path, "r") as file:
+    score_categories = json.load(file)
+
+
+# List of primary scores and list of secondary scores
+primary_score_list = list(_score_mapping.keys()) + ["MMD coalition"]
+secondary_score_list = [
+    score
+    for ls in score_categories.values()
+    for score in ls
+    if score not in _score_mapping.values()
+]
+
 ##########
 
 
