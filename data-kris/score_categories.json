@@ -1,0 +1,55 @@
+{
+    "partisan": [
+        "fptp_seats",
+        "efficiency_gap_wasted_votes", 
+        "efficiency_gap_statewide", 
+        "mean_median_average_district",
+        "geometric_seats_bias", 
+        "competitive_district_count", 
+        "average_margin",
+
+        "estimated_seats",
+        "disproportionality",
+        "pr_deviation",
+        "proportionality",
+        "efficiency_gap",
+        "seats_bias",
+        "votes_bias",
+        "declination",
+        "mean_median_statewide",
+        "turnout_bias",
+        "lopsided_outcomes",
+        "proportionality",
+        "competitive_districts",
+        "responsiveness",
+        "responsive_districts",
+        "overall_responsiveness",
+        "competitiveness"
+    ],
+
+    "minority": [
+        "mmd_black",
+        "mmd_hispanic", 
+        "mmd_coalition", 
+   
+        "opportunity_districts", 
+        "coalition_districts", 
+        "minority"
+    ],
+    "compactness": [
+        "cut_score",
+        "reock",
+        "polsby_popper",
+
+        "population_compactness",
+        "compactness"
+    ],
+    "splitting": [
+        "counties_split",
+        "county_splits",
+    
+        "county_splitting",
+        "district_splitting",
+        "splitting"
+    ]
+}
