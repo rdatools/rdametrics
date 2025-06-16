@@ -4,7 +4,7 @@
 'THUNKING' BETWEEN SCORES & AGGREGATES HELPERS AND KRIS' ANALYSIS CODE
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict
 
 import os
 import json
@@ -19,6 +19,8 @@ from data import (
     load_aggregates,
     arr_from_aggregates,
 )
+
+debug: bool = False  # Set to True to run the test code at the end of this file
 
 ########## SUPPORT CODE ##########
 
@@ -68,56 +70,60 @@ def _calc_d_vote_share(xx: str, chamber: str, ensemble: str) -> np.ndarray:
     return np.array(to_return)
 
 
+_score_mapping: Dict[str, str] = {
+    "Reock": "reock",
+    "Polsby-Popper": "polsby_popper",
+    "cut edges": "cut_score",
+    "Dem seats": "fptp_seats",
+    "efficiency gap": "efficiency_gap_wasted_votes",
+    "mean-median": "mean_median_average_district",
+    "seat bias": "geometric_seats_bias",
+    "competitive districts": "competitive_district_count",
+    "average margin": "average_margin",
+    "MMD black": "mmd_black",
+    "MMD hispanic": "mmd_hispanic",
+    "county splits": "county_splits",
+    "counties split": "counties_split",
+    # Extend this mapping, to support more scores
+}
+
+
 def _map_score_name(user_name: str) -> str:
     """Map Kris' score names to the names in the scores dataframe."""
 
     if user_name == "by_district":
         return "by_district"
 
-    mapping: Dict[str, str] = {
-        "Reock": "reock",
-        "Polsby-Popper": "polsby_popper",
-        "cut edges": "cut_score",
-        "Dem seats": "fptp_seats",
-        "efficiency gap": "efficiency_gap_wasted_votes",
-        "mean-median": "mean_median_average_district",
-        "seat bias": "geometric_seats_bias",
-        "competitive districts": "competitive_district_count",
-        "average margin": "average_margin",
-        "MMD black": "mmd_black",
-        "MMD hispanic": "mmd_hispanic",
-        "county splits": "county_splits",
-        "counties split": "counties_split",
-        # Extend this mapping, to support more scores
-    }
-    if user_name in mapping:
-        return mapping[user_name]
+    if user_name in _score_mapping:
+        return _score_mapping[user_name]
     else:
         raise ValueError(f"Unknown user score: {user_name}. Please check the mapping.")
+
+
+_ensemble_mapping: Dict[str, str] = {
+    "base0": "A0",
+    "base1": "A1",
+    "base2": "A2",
+    "base3": "A3",
+    "base4": "A4",
+    "pop_minus": "Pop-",
+    "pop_plus": "Pop+",
+    "ust": "C",
+    "distpair": "B",
+    "distpair_ust": "D",
+    "reversible": "Rev",
+    "county25": "R25",
+    "county50": "R50",
+    "county75": "R75",
+    "county100": "R100",
+}
 
 
 def _map_ensemble_name(user_name: str) -> str:
     """Map Kris' ensemble names to the names in the helpers."""
 
-    mapping: Dict[str, str] = {
-        "base0": "A0",
-        "base1": "A1",
-        "base2": "A2",
-        "base3": "A3",
-        "base4": "A4",
-        "pop_minus": "Pop-",
-        "pop_plus": "Pop+",
-        "ust": "C",
-        "distpair": "B",
-        "distpair_ust": "D",
-        "reversible": "Rev",
-        "county25": "R25",
-        "county50": "R50",
-        "county75": "R75",
-        "county100": "R100",
-    }
-    if user_name in mapping:
-        return mapping[user_name]
+    if user_name in _ensemble_mapping:
+        return _ensemble_mapping[user_name]
     else:
         raise ValueError(
             f"Unknown user ensemble: {user_name}. Please check the mapping."
@@ -177,32 +183,32 @@ def fetch_score_array(state, chamber, ensemble_type, score):
 
 ########## TEST CODE ##########
 
-# xx = "NC"
-# chamber = "congress"
-# ensemble = "base0"
+if debug:
+    xx = "NC"
+    chamber = "congress"
 
-# for score in [
-#     "Reock",
-#     "Polsby-Popper",
-#     "cut edges",
-#     "Dem seats",
-#     "efficiency gap",
-#     "mean-median",
-#     "seat bias",
-#     "competitive districts",
-#     "average margin",
-#     "MMD black",
-#     "MMD hispanic",
-#     "county splits",
-#     "counties split",
-# ]:
-#     print(f"Fetching score: {score}")
-#     result = fetch_score_array(state, chamber, ensemble, score)
+    print("Exercise fetch_score_array with all scores:")
 
-# print("Fetching D vote share (by_district)")
-# score = "by_district"
-# result = fetch_score_array(state, chamber, ensemble, score)
+    ensemble = "base0"
+    for score in _score_mapping.keys():
+        print(f"  Fetching score: {score} ...")
+        result = fetch_score_array(state, chamber, ensemble, score)
 
-# pass  # for debugging
+    print("Exercise fetch_score_array for all ensembles")
+
+    score = "Dem seats"
+    for ensemble in _ensemble_mapping.keys():
+        print(f"  Fetching score: {ensemble}")
+        result = fetch_score_array(state, chamber, ensemble, score)
+
+    print("Exercise fetch_score_array for D vote share")
+
+    print("  Fetching D vote share (by_district)")
+    score = "by_district"
+    result = fetch_score_array(state, chamber, ensemble, score)
+
+    print("Done.")
+
+pass  # for debugging
 
 ### END ###
