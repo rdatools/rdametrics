@@ -90,6 +90,8 @@ Also make sure you've installed the dependencies as described above.
 Then, to load the scores 'pandas' dataframe, use the `load_scores` helper function:
 
 ```python
+from data import load_scores
+
 scores_df = load_scores("/path/to/scores.parquet")
 ```
 
@@ -102,6 +104,8 @@ Alternatively, you can filter the dataframe to the subset for a state, chamber, 
 ensemble using the `df_from_scores` helper function:
 
 ```python
+from data import df_from_scores
+
 xx = "NC"
 chamber = "congress"
 ensemble = "A0"
@@ -112,6 +116,8 @@ You can also fetch an individual metric for for a state, chamber, and
 ensemble with the `arr_from_scores` helper function:
 
 ```python
+from data import arr_from_scores
+
 metric = "estimated_seats"
 arr = arr_from_scores(xx, chamber, ensemble, metric, scores_df)
 ```
@@ -126,6 +132,8 @@ To work with by-district aggregates, first load the desired aggregates
 from disk using the `load_aggregates` helper function:
 
 ```python
+from data import load_aggregates
+
 xx = "NC"
 chamber = "congress"
 ensemble = "A0"
@@ -142,6 +150,8 @@ By default, this will load the 'vap' aggregates for the 'minority' category.
 If you want the 'cvap' aggregates instead, modify the `load_aggregates` call like this:
 
 ```python
+from data import load_aggregates
+
 category = "minority"
 aggregates_subset = load_aggregates(xx, chamber, ensemble, category, zip_dir, minority_dataset="cvap")
 ```
@@ -158,6 +168,8 @@ Alternatively, you can extract an individual aggregate from the loaded subset
 using the `arr_from_aggregates` helper function:
 
 ```python
+from data import arr_from_aggregates
+
 aggregate = "dem_by_district"
 arr = arr_from_aggregates(aggregate, aggregates_subset)
 ```
