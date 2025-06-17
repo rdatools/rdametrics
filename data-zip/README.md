@@ -1,4 +1,4 @@
-# Using scores_df.parquet
+# Using Scores and By-District Aggregates
 
 There are 2,016 scores CSV files in our study containing 48 scores for 6.7 million plans!
 
@@ -10,23 +10,16 @@ There are 2,016 scores CSV files in our study containing 48 scores for 6.7 milli
 - 20,000 plans per ensemble
 
 Each scores CSV is easy to import into a spreadsheet, but if you want to work with the data, this surface area is daunting.
+The by-district aggregates have a similar surface area.
 
-So we created a single, integrated `pandas` dataframe that contains all of the scores: `scores_df.parquet`.
-Each set of scores is indexed with three columns:
+So we created a single, integrated `pandas` dataframe that contains all of the scores: `scores.parquet` and
+a set of helpers to make working with it and the by-district aggregates easier.
 
-- `state` -- the state name
-- `chamber` -- the chamber name
-- `ensemble` -- the ensemble id
-
-For a specific state, chamber, and ensemble combination, all 6 categories of scores 
-&mdash;general, partisan, minority, compactness, splitting, and majority-minority (MMD)&mdash;
-are together.
-
-## Using `scores.parquet`
+## Using `scores.parquet` Natively
 
 The information below describes how to load the dataframe from disk and how filter for specific scores.
 
-### Loading the Dataframe
+### Installing Dependencies
 
 To use `scores.parquet`, you need to have `pandas` and `pyarrow` installed. You can install them using pip:
 
@@ -34,6 +27,8 @@ To use `scores.parquet`, you need to have `pandas` and `pyarrow` installed. You 
 pip install pandas
 pip install pyarrow
 ```
+
+### Loading the Dataframe
 
 Then the Python is simple:
 
@@ -49,7 +44,16 @@ See "Helpers" below for more information.
 
 ### Index Columns
 
-You can filter the dataframe using the index columns: `state`, `chamber`, and `ensemble`.
+Each set of scores is indexed with three columns:
+
+- `state` -- the state name
+- `chamber` -- the chamber name
+- `ensemble` -- the ensemble id
+
+You can use them to filter the dataframe.
+For a specific state, chamber, and ensemble combination, all 6 categories of scores 
+&mdash;general, partisan, minority, compactness, splitting, and majority-minority (MMD)&mdash;
+are together.
 
 There are 7 states : `FL`, `IL`, `MI`, `NC`, `NY`, `OH`, and `WI`.
 There are 3 chambers: `congress` and `upper` and `lower` states houses.
@@ -60,15 +64,14 @@ It has a chain length of 1 billion and a subsampling rate of every 50,000th plan
 The `Rev*` is the original reversible ensemble that we produced using the same chain length (50 million) 
 and subsampling rate (every 2,500) as the other non-reversible ensembles.
 
-## Helpers
+## Using the Helpers to Work with Scores and By-District Aggregates
 
-The functions in `helpers.py` and the constants in `constants.py`
-make it easier to work with the all-up scores 'pandas' dataframe
-(scores.parquet) and all the by-district aggregates contained in the state/chamber
-zip files. To use them, import `helpers.py` into your Python. Put the
-companion file, constants.py, along side it.
+The Python code the `data/` folder makes it easier to work with `scores.parquet` and 
+all the by-district aggregates contained in the state/chamber zip files. 
+To use it, put the contents&mdash;including the `__init__.py` file&mdash;in the root of your project. 
+Make sure you've installed the dependencies as described above.
 
-To work with the scores dataframe, load 'panda' dataframe from disk:
+Then, to work with the scores dataframe, load 'panda' dataframe from disk:
 
 ```python
 scores_df = load_scores("/path/to/scores.parquet")
