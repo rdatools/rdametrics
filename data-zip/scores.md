@@ -1,7 +1,6 @@
 # Scores (Metrics)
 
-These are the metrics ("scores") calculated for a plan, when you run the score_ensemble.py script.
-
+These are the "scores" (metrics) calculated for a plan.
 To make them easier to work with, metrics are stored in separate files by category: 
 
 * **General** &ndash; population deviation
@@ -11,7 +10,8 @@ To make them easier to work with, metrics are stored in separate files by catego
 * **Splitting** &ndash; measures of county-district splitting
 * **Global** &ndash; measures that depend on other measures, e.g., MOD districts
 
-For each of those categories, there is a CSV with plan-level scores and a JSONL file with by-district measurements. *Note: The first value in each by-district list is the total for the state. The values 1-N are the values for the individual districts.*
+For each of those categories, there is a CSV with plan-level scores and a JSONL file with by-district aggregates. 
+*Note: The first value in each by-district aggregate is the total for the state. The values 1-N are the values for the individual districts.*
 
 ## General
 
@@ -19,13 +19,18 @@ There is one general metric:
 
 *   **population_deviation** &ndash; The population deviation of the plan.
 
+There is one corresponding by-district aggregate:
+
+* **pop_by_district** &ndash;  The total population by district.
+
 ## Partisan 
 
 The measures of partisan bias (next) and competitiveness & responsiveness (following) are described in some detail in
 [Advanced Measures of Bias &amp; Responsiveness](https://medium.com/dra-2020/advanced-measures-of-bias-responsiveness-c1bf182d29a9).
 Many use [fractional seat probabilities](https://lipid.phys.cmu.edu/nagle/Technical/FractionalSeats2.pdf).
 
-*   **estimated_vote_pct** &ndash; The Democratic two-party vote share.
+*   **estimated_vote_pct** &ndash; The Democratic two-party vote share. 
+    This is the same for every plan for a state.
 
 These are the plan-level partisan bias metrics:
 
@@ -46,11 +51,6 @@ These are the plan-level partisan bias metrics:
 *   **lopsided_outcomes** (LO) &ndash; The difference between the average two-party vote shares for the Democratic and Republican wins.
 *   **proportionality** &ndash; DRA's propoprtionality rating. Integers [0-100], where bigger is better.
 
-There are two by-district aggregates:
-
-* **dem_by_district** &ndash;  The number of Democratic votes by district.
-* **tot_by_district** &ndash; The total two-party (Democratic & Republican) votes by district.
-
 These are the competitiveness & responsiveness metrics:
 
 *   **competitive_district_count** &ndash; The number of districts that fall into the 45-55% Democratic/Republican range.
@@ -60,6 +60,11 @@ These are the competitiveness & responsiveness metrics:
 *   **responsive_districts** &ndash; The likely number of responsive districts, using fractional seat probabilities.
 *   **overall_responsiveness** (R) &ndash; An overall measure of responsiveness which you can think of as a winner’s bonus.
 *   **competitiveness** &ndash; DRA's competitiveness rating. Integers [0-100], where bigger is better.
+
+There are two by-district aggregates:
+
+* **dem_by_district** &ndash;  The number of Democratic votes by district.
+* **tot_by_district** &ndash; The total two-party (Democratic & Republican) votes by district.
 
 ## Minority
 
@@ -87,6 +92,8 @@ There are mostly self-explanatory by-district aggregates for each VAP category:
 * **native_vap**
 * **minority_vap** &ndash; The total VAP minus white VAP, i.e., all minorities combined.
 
+There are also corresponding CVAP by-district aggregates.
+
 ## Compactness
 
 The measures of compactness:
@@ -98,7 +105,8 @@ The measures of compactness:
 *   **population_compactness** &ndash; The population compactness of the map. Lower is more *energy* compact. Smaller is better.
 *   **compactness** &ndash; DRA's compactness rating. Integers [0-100], where bigger is better.
 
-There are two sets of by-district aggregates for compactness. First abstracts of district shapes from which Reock & Polsby-Popper can be computed efficiently:
+There are two sets of by-district aggregates for compactness. 
+First abstracts of district shapes from which Reock & Polsby-Popper can be computed efficiently:
 
 * **area**
 * **diameter**
@@ -122,15 +130,16 @@ The county and district splitting measures are described in
 *   **county_splits** &ndash; The number of *times* counties are split, e.g, a county may be split more than once. Smaller is better.
 *   **splitting** &ndash; DRA's county-district splitting rating. Integers [0-100], where bigger is better.
 
+There is one associated by-district aggregate:
+
+* **district_splitting**
+
 ## Global
 
-This category (and CSV file) includes metrics that depend on other metrics and/or 
-depend on by-district measurements from multiple categories. 
-Right now this category includes:
+This category includes metrics that depend on other metrics and/or depend on by-district measurements from multiple categories. 
+For the paper, this category includes:
 
 *   **mmd_districts** &ndash; The sum of majority-minority districts (MMD) for Blacks alone, Hispanics alone, and Blacks & Hispanics together (but neither alone, i.e., coalitions).
 *   **mmd_reock** &ndash; The average Reock for MMD districts.
 *   **mmd_polsby_popper** &ndash; The average Polsby-Popper for MMD districts.
 *   **mmd_district_splitting** &ndash; The average district-splitting for MMD districts.
-
-Separate from those plan-level scores, there are a series of parallel JSONL files that hold by-district measurements.
