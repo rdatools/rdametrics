@@ -12,7 +12,6 @@ import fnmatch
 import lzma
 import tempfile
 
-from rdapy import smart_read
 from .constants import (
     states,
     chambers,
