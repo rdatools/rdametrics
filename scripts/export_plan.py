@@ -92,28 +92,26 @@ def main() -> None:
         Path(output_file_path).unlink(missing_ok=True)
         raise RuntimeError(f"distill command failed: {e.stderr}") from e
 
-    # Scan the plans in the ensemble; find the specified plan
+    # Scan the plans in the ensemble, find the specified plan, and export it as a CSV
 
     try:
+        plan_found: bool = False
         with open(output_path, "r") as ensemble_stream:
             for name, plan in ensemble_plans(ensemble_stream):
-                pass
+                if name == args.plan:
+                    plan_found = True
+                    with open(args.output, "w") as output_file:
+                        print("GEOID20,District", file=output_file)
+                        for geoid, district in plan.items():
+                            print(f"{geoid},{district}", file=output_file)
+                    print(f"Plan {name} written to {args.output}")
 
     finally:
         output_path.unlink(missing_ok=True)
-
-    pass
-
-    # io_dir: str = "~/Downloads/first_10/"
-    # plans_file: str = "plans.jsonl"
-
-    # with smart_read(io_dir + plans_file) as ensemble_stream:
-    #     for name, plan in ensemble_plans(ensemble_stream):
-    #         assignment_file: str = f"{name}.csv"
-    #         with open(os.path.expanduser(io_dir + assignment_file), "w") as f:
-    #             print("GEOID20,District", file=f)
-    #             for geoid, district in plan.items():
-    #                 print(f"{geoid},{district}", file=f)
+        if not plan_found:
+            print(
+                f"Plan {args.plan} not found in {args.xx}/{args.chamber}/{args.ensemble}."
+            )
 
     pass
 
