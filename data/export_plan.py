@@ -12,7 +12,7 @@ from typing import Any, List, Dict, TextIO, Tuple, Generator
 import os, json, zipfile, lzma, tempfile, subprocess
 from pathlib import Path
 
-from rdapy import smart_read, read_record
+from rdapy import read_record
 
 from data.constants import states, chambers, ensembles
 from data.filenames import get_ensemble_name
@@ -155,7 +155,7 @@ def parse_args():
     parser.add_argument(
         "--input-dir",
         type=str,
-        default="~/local/beta-ensembles/zipped",
+        required=True,
         help="The input directory containing the zipped ensembles",
     )
 
@@ -163,33 +163,33 @@ def parse_args():
         "--state",
         type=str,
         dest="xx",
-        default="NC",
+        required=True,
         help="The state for the ensemble",
     )
     parser.add_argument(
         "--plan-type",
         type=str,
         dest="chamber",
-        default="congress",
+        required=True,
         help="The plan type of the ensemble",
     )
     parser.add_argument(
         "--ensemble",
         type=str,
-        default="A0",
+        required=True,
         help="The variant id of the ensemble",
     )
     parser.add_argument(
         "--plan",
         type=str,
-        default="7460000",
+        required=True,
         help="The plan name",
     )
 
     parser.add_argument(
         "--output",
         type=str,
-        default="temp/TEST.csv",
+        required=True,
         help="The output precinct-assignment CSV file",
     )
 
