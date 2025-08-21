@@ -30,7 +30,7 @@ from rdametrics import (
 
 ##########
 
-scores_path: str = "~/local/beta-ensembles/dataframe/contents/scores_df.parquet"
+scores_path: str = "~/local/beta-ensembles/prepackaged/scores/scores.parquet"
 output_dir: str = "analysis/correlations"
 
 ##########

@@ -15,9 +15,10 @@ correlations_ensembles = [
 ignore_by_category: Dict[str, List[str]] = {
     "general": [],
     "proportionality": [
-        "estimated_seats",
+        # "estimated_seats",
         "pr_deviation",
-        "mean_median_average_district",
+        "mean_median_statewide",
+        # "mean_median_average_district",
         "turnout_bias",
     ],
     "competitiveness": [],
