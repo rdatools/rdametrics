@@ -17,30 +17,6 @@ import pandas as pd
 
 from rdapy import read_json
 
-# from rdametrics import ensembles
-
-# ensemble_filenames: List[str] = [
-#     "base0",  # Cut edges, minimum spanning tree
-#     "base1",
-#     "base2",
-#     "base3",
-#     "base4",
-#     "pop_minus",
-#     "pop_plus",
-#     "distpair",  # District pairs, minimum spanning tree
-#     "ust",  # Cut edges, uniform spanning tree
-#     "distpair_ust",  # District pairs, uniform spanning tree
-#     "reversible_original",  # The original 50M sampled every 2.5K ensembles
-#     "reversible",  # The revised 1B sampled every 50K ensembles
-#     "county25",
-#     "county50",
-#     "county75",
-#     "county100",
-# ]
-
-# ensemble_mapping: Dict[str, str] = dict(zip(ensembles, ensemble_filenames))
-
-
 table_dir: str = (
     "~/Documents/work/Ensembles/partisan-bias-of-ensembles/tables/intermediate"
 )
