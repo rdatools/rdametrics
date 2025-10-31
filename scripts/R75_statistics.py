@@ -29,8 +29,12 @@ metrics: List[str] = [
     "district_splitting",
 ]
 
-# Subset to R75 ensemble
-df_r75 = df[df["ensemble"] == "R75"]
+# Subset to R75 ensemble for NC/congress
+xx: str = "NC"
+chamber: str = "congress"
+ensemble: str = "R75"
+
+df = df[(df["state"] == xx) & (df["chamber"] == chamber) & (df["ensemble"] == ensemble)]
 
 # Initialize results dictionary
 results = {}
@@ -38,10 +42,10 @@ results = {}
 # Compute statistics for each metric
 for metric in metrics:
     results[metric] = {
-        "min": round(df_r75[metric].min(), 4),
-        "max": round(df_r75[metric].max(), 4),
-        "mean": round(df_r75[metric].mean(), 4),
-        "median": round(df_r75[metric].median(), 4),
+        "min": round(df[metric].min(), 4),
+        "max": round(df[metric].max(), 4),
+        "mean": round(df[metric].mean(), 4),
+        "median": round(df[metric].median(), 4),
     }
 
 print(results)
