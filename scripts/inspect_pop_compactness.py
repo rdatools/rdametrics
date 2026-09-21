@@ -34,17 +34,16 @@ for xx in scores_df["state"].unique():
                 & (scores_df["ensemble"] == ensemble)]["population_compactness"]
             density_by_combo[(xx, chamber, ensemble)] = scores.tolist()
 
+            arr = np.array(density_by_combo[(xx, chamber, ensemble)])
+            print(f"{xx}, {chamber:<8}, {ensemble:<4}: "
+                f"min={arr.min():>13,.2f}  max={arr.max():>13,.2f}  "
+                f"mean={arr.mean():>13,.2f}  stdev={arr.std():>13,.2f}")
+
             pass # for debugging
         pass # for debugging
     pass # for debugging
 
 pass # for debugging
-
-for (xx, chamber, ensemble), values in density_by_combo.items():
-    arr = np.array(values)
-    print(f"{xx}, {chamber}, {ensemble}: "
-          f"min={arr.min():.2f}, max={arr.max():.2f}, "
-          f"mean={arr.mean():.2f}, stdev={arr.std():.2f}")
 
 # stats_by_combo = {}
 # for key, values in density_by_combo.items():
