@@ -27,6 +27,9 @@ density_by_combo: Dict[Tuple[str, str, str], List[float]] = dict()
 for xx in scores_df["state"].unique():
     for chamber in scores_df["chamber"].unique():
         for ensemble in scores_df["ensemble"].unique():
+            if ensemble == "Rev*":
+                continue
+            
             density_by_combo[(xx, chamber, ensemble)] = list()
             scores = scores_df[
                 (scores_df["state"] == xx) 
